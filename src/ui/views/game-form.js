@@ -2,7 +2,7 @@
 import { store, navigate, back } from '../../app.js';
 import { h, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
-import { gameLogo, header, stepper, toast } from '../components.js';
+import { GAME_ICONS, gameLogo, header, sheet, stepper, toast } from '../components.js';
 import { COUNTDOWN_WIN, MODES, MODE_LABELS, defaultScoring, normalizeScoring } from '../../logic/scoring.js';
 import { cropImage, pickImageFile } from '../image.js';
 import { DICE_FACES, MAX_DICE, normalizeDice } from '../../logic/dice.js';
@@ -37,11 +37,20 @@ export function gameFormView({ id }) {
 
   const renderLogo = () => {
     setChildren(logoBox, 
-      gameLogo({ name: g.name || '?', logo: g.logo }, 96),
+      gameLogo({ name: g.name || '?', logo: g.logo, icon: g.icon }, 96),
       h('div', { class: 'stack tight' },
+        h('button', { type: 'button', class: 'btn small', onclick: chooseIcon }, '🎨', 'Choisir une vignette'),
         h('button', { type: 'button', class: 'btn small', onclick: () => choosePhoto(true) }, icon('camera', 18), 'Prendre une photo'),
         h('button', { type: 'button', class: 'btn small', onclick: () => choosePhoto(false) }, icon('image', 18), 'Choisir une image'),
-        g.logo && h('button', { type: 'button', class: 'btn small ghost', onclick: () => { g.logo = null; renderLogo(); } }, 'Icône automatique')));
+        g.logo && h('button', { type: 'button', class: 'btn small ghost', onclick: () => { g.logo = null; renderLogo(); } }, 'Retirer la photo')));
+  };
+  const chooseIcon = () => {
+    const pick = (value) => { g.icon = value; g.logo = null; renderLogo(); sh.close(); };
+    const sh = sheet(h('div', { class: 'stack' },
+      h('div', { class: 'emoji-grid icons' }, GAME_ICONS.map((e) =>
+        h('button', { type: 'button', class: `emoji-btn ${g.icon === e ? 'on' : ''}`, onclick: () => pick(e) }, e))),
+      h('button', { type: 'button', class: 'btn ghost', onclick: () => pick(null) }, 'Sans vignette (initiales)')),
+    { title: 'Vignette du jeu' });
   };
   const choosePhoto = async (camera) => {
     const file = await pickImageFile({ camera });

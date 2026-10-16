@@ -79,5 +79,23 @@ describe('catalogue des jeux de la maison', () => {
     expect(store.list('sessions').filter((s) => s.gameId === skyjo.id)).toHaveLength(1);
     expect(store.list('games')).toHaveLength(games.length + 2); // + Yams et Pandémie
   });
+
+  it('chaque jeu du catalogue a une vignette', () => {
+    for (const g of games) expect(g.icon, g.name).toBeTruthy();
+  });
+
+  it('mise à jour v2 → v3 : les vignettes arrivent, les jeux modifiés sont respectés', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    // État d'un téléphone en version 2 : mêmes jeux, sans vignette, plus anciens
+    const old = games.map(({ icon, ...g }) => ({ ...g, updatedAt: Date.UTC(2024, 0, 1) }));
+    store.applyRemote({ games: old });
+    const azul = store.list('games').find((g) => g.name === 'Azul');
+    store.save('games', { ...azul, notes: 'Modifié sur le téléphone' });
+    const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
+    expect(stats.games).toMatchObject({ added: 0, updated: games.length - 1 });
+    expect(store.list('games').find((g) => g.name === 'Splendor').icon).toBe('💎');
+    expect(store.get('games', azul.id).icon).toBeUndefined();
+    expect(store.get('games', azul.id).notes).toBe('Modifié sur le téléphone');
+  });
 });
 

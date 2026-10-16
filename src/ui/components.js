@@ -45,8 +45,22 @@ export function gameLogo(game, size = 64) {
   }
   const name = game?.name || '?';
   const color = autoLogoColor(name);
+  if (game?.icon) {
+    // Vignette illustrée : un dessin sur fond coloré
+    return h('div', { class: 'logo logo-icon', style: { ...style, fontSize: `${Math.round(size * 0.56)}px`, '--c': color }, 'aria-hidden': 'true' },
+      h('span', null, game.icon));
+  }
   return h('div', { class: 'logo logo-auto', style: { ...style, '--c': color }, 'aria-hidden': 'true' }, initials(name));
 }
+
+/** Choix de vignettes proposées dans le formulaire d'un jeu. */
+export const GAME_ICONS = [
+  '🎲', '🃏', '♠️', '🧩', '♟️', '🎯', '🏆', '👑', '💎', '🪙', '🏰', '🏛️', '🗿', '⚔️', '🛡️', '🗡️',
+  '🐉', '🦄', '👻', '💀', '🧙', '🧚', '🕵️', '🎭', '🎩', '🤠', '🏴‍☠️', '👩‍🚀', '🚀', '🪐', '🌌', '🌍',
+  '🌲', '🍄', '🌊', '🌈', '🍂', '🌸', '🐘', '🦁', '🐺', '🦊', '🐑', '🐔', '🐢', '🐦', '🦜', '🐟',
+  '🐞', '🐭', '🐵', '🐰', '🍎', '🍣', '🌮', '🍕', '🚂', '⛵', '🏝️', '🏘️', '🏗️', '🎰', '⏳', '⏱️',
+  '🧠', '💡', '🔎', '🧮', '🔤', '✏️', '💬', '🤔', '🤐', '👀', '🎁', '🔥', '💞', '🧸', '🎨', '🎵',
+];
 
 export function avatar(player, size = 40) {
   const color = player?.color || '#999';

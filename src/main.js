@@ -61,9 +61,11 @@ function applyCatalog(store) {
   } catch {
     /* ignoré */
   }
-  if (stats.games.added > 0) {
-    setTimeout(() => toast(`${plural(stats.games.added, 'jeu de la maison ajouté', 'jeux de la maison ajoutés')} à la ludothèque.`), 600);
-  }
+  const { added, updated } = stats.games;
+  let msg = null;
+  if (added > 0) msg = `${plural(added, 'jeu de la maison ajouté', 'jeux de la maison ajoutés')} à la ludothèque.`;
+  else if (updated > 0) msg = `Nouvelles vignettes pour ${plural(updated, 'jeu', 'jeux')} 🎨`;
+  if (msg) setTimeout(() => toast(msg), 600);
 }
 
 initStore().then((store) => {

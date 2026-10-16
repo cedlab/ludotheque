@@ -7,8 +7,12 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 2;
+export const CATALOG_VERSION = 3;
 const T = Date.UTC(2024, 0, 1);
+// Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
+// les versions précédentes : un jeu non modifié sur le téléphone reçoit la
+// vignette ; un jeu modifié depuis (date plus récente) garde sa version.
+const REVISED = Date.UTC(2024, 1, 1);
 
 const sc = (mode, extra = {}) => ({
   mode, teams: false, rounds: false, startScore: 20, countdownWin: 'lastStanding',
@@ -113,13 +117,39 @@ const GAMES = [
   ['The Crew : en quête de la neuvième planète', 2, 5, 20, 10, COOP],
 ];
 
+// Vignettes : un dessin (emoji) qui évoque chaque jeu.
+const ICONS = {
+  'Splendor': '💎', 'Terraforming Mars': '🪐', 'Terraforming Mars : le jeu de dés': '🎲', 'Chakra': '🧘',
+  'Kosmopolit': '🍜', 'Rauha': '🌲', 'Les Inventeurs': '💡', 'Battle Sheep': '🐑',
+  'Les Aventuriers du Rail : Europe': '🚂', 'Ark Nova': '🐘', 'Secret Identity': '🕵️', 'Tranquillité': '🌊',
+  'Château Combo': '🏰', 'Kingdomino': '👑', 'Fun Facts': '🤔', 'Azul': '🔷', 'Kids of London': '🧒',
+  'Augustus': '🦅', 'Mysterium': '👻', 'Wingspan': '🐦', 'Wingspan Asie': '🦜', 'Seasons': '🍂',
+  'Mémoire 44': '🪖', 'Scrabble Junior': '🔤', 'Fiesta de los Muertos': '💀', 'Sur les traces de Darwin': '🐢',
+  'Codenames': '🔎', 'Mr. Jack': '🎩', '7 Wonders Duel': '⚔️', 'Las Vegas': '🎰', 'Zenith': '🌌',
+  'The Manhattan Project': '☢️', 'Courtisans': '👸', 'Sushi Go Party!': '🍣', 'Yokai': '🦊', 'Faraway': '🏜️',
+  'Little Town': '🏘️', 'Akropolis': '🏛️', '7 Wonders': '🗿', '7 Wonders Architects': '🏗️',
+  'Monkey Palace': '🐒', 'It’s a Wonderful World': '🌍', 'Turing Machine': '🧮', 'Ceci n’est pas une pomme': '🍎',
+  'Osmooz Couples': '💞', 'Osmooz Hot': '🔥', 'Mon premier jeu de parcours': '🐞', 'Comme des petits singes': '🐵',
+  'Premier jeu d’association (Nathan)': '🧩', 'Une cuillère pour Martin': '🥄', 'Loto des p’tits incollables': '🦔',
+  'Domino des p’tits incollables': '🐄', 'Maman et ses petits': '🐰', 'Colorino': '🌈',
+  'Skyjo': '🃏', 'La Guerre des Moutons': '🐏', 'Speedbac': '⏱️', 'Odin': '🛡️', 'Star Realms': '🚀',
+  'Boursicocotte': '🐔', 'Texto!': '💬', 'Énigmes ? Monde animal': '🦒', 'Énigmes ? Corps humain': '🫀',
+  'Le Petit Bac': '✏️', 'Parade': '😼', 'Dobble': '👀', 'Timeline': '⏳', 'Speed Runners': '🏃',
+  'Cortex Challenge': '🧠', 'Médiévallons': '🗡️', 'Bazar Bizarre 2.0': '🐭', 'Codex Naturalis': '🍄',
+  'Bandido': '🦹', 'De l’Orc pour les Braves': '👹', 'Taboo XXL': '🤐', 'Sea Salt & Paper': '⛵', 'Trio': '3️⃣',
+  'Taco Loco': '🌮', 'That’s Not a Hat': '🎁', 'Service Compris !': '🍽️', 'The Line': '📏',
+  'Les Bâtisseurs : Moyen-Âge': '⚒️', 'Similo : Animaux sauvages': '🦁', 'Jeu de 32 cartes': '♠️',
+  'L’Imposteur': '🎭', 'Uno': '🔴', 'One Piece : Deviens le roi des pirates': '🏴‍☠️', 'Loup-Garou pour une nuit': '🐺',
+  'Duck & Cover': '🦆', 'The Crew : en quête de la neuvième planète': '👩‍🚀',
+};
+
 const pad = (n) => String(n).padStart(4, '0');
 
 export function catalogGames() {
   return GAMES.map(([name, minPlayers, maxPlayers, duration, minAge, scoring, extra = {}], i) => ({
     id: `00000000-0000-4000-8000-00000001${pad(i + 1)}`,
     createdAt: T,
-    updatedAt: T,
+    updatedAt: REVISED,
     deleted: false,
     name,
     logo: null,
@@ -129,6 +159,7 @@ export function catalogGames() {
     minAge,
     scoring: structuredClone(scoring),
     dice: null,
+    icon: ICONS[name] || null,
     notes: '',
     ...structuredClone(extra),
   }));

@@ -1729,3 +1729,20 @@ html.picker-open body {
   padding: 10px 18px;
   background: var(--surface);
 }
+
+/* Vignette illustrée d'un jeu */
+.logo-icon {
+  overflow: hidden;
+  line-height: 1;
+  background:
+    radial-gradient(circle at 28% 22%, rgb(255 255 255 / 55%), transparent 52%),
+    radial-gradient(circle at 80% 90%, rgb(0 0 0 / 14%), transparent 55%),
+    linear-gradient(150deg, color-mix(in srgb, var(--c) 45%, #fff6ea), var(--c));
+}
+.logo-icon span {
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 28%));
+  transform: translateY(2%);
+}
+.emoji-grid.icons {
+  grid-template-columns: repeat(8, 1fr);
+}

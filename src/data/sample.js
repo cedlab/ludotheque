@@ -32,22 +32,22 @@ const scoring = (s) => ({
 
 const games = [
   {
-    ...base(G.skyjo, 10), name: 'Skyjo', logo: null, minPlayers: 2, maxPlayers: 8, duration: 30, minAge: 8,
+    ...base(G.skyjo, 200), name: 'Skyjo', icon: '🃏', logo: null, minPlayers: 2, maxPlayers: 8, duration: 30, minAge: 8,
     scoring: scoring({ mode: 'lowest', rounds: true }),
     notes: 'La partie s’arrête quand un joueur dépasse 100 points. Le plus petit total gagne.',
   },
   {
-    ...base(G.yams, 100), name: 'Yams', dice: { count: 5, faces: 6 }, logo: null, minPlayers: 1, maxPlayers: 6, duration: 30, minAge: 7,
+    ...base(G.yams, 201), name: 'Yams', icon: '🎲', dice: { count: 5, faces: 6 }, logo: null, minPlayers: 1, maxPlayers: 6, duration: 30, minAge: 7,
     scoring: scoring({ mode: 'highest' }),
     notes: '5 dés, 3 lancers par tour. Bonus de 35 points si la partie haute atteint 63.',
   },
   {
-    ...base(G.uno, 12), name: 'Uno', logo: null, minPlayers: 2, maxPlayers: 10, duration: 20, minAge: 6,
+    ...base(G.uno, 202), name: 'Uno', icon: '🔴', logo: null, minPlayers: 2, maxPlayers: 10, duration: 20, minAge: 6,
     scoring: scoring({ mode: 'target', target: 500, rounds: true }),
     notes: 'Le gagnant d’une manche marque les points des cartes restant chez les autres.',
   },
   {
-    ...base(G.pandemie, 13), name: 'Pandémie', logo: null, minPlayers: 2, maxPlayers: 4, duration: 45, minAge: 8,
+    ...base(G.pandemie, 203), name: 'Pandémie', icon: '🦠', logo: null, minPlayers: 2, maxPlayers: 4, duration: 45, minAge: 8,
     scoring: scoring({ mode: 'coop', coopScore: false }),
     notes: 'Jeu coopératif : trouvez les 4 remèdes avant la fin de la pioche.',
   },
