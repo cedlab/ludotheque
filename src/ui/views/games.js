@@ -7,11 +7,12 @@ import { describeScoring } from '../../logic/scoring.js';
 import { describeDice, normalizeDice } from '../../logic/dice.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { sampleData } from '../../data/sample.js';
+import { normalizeName } from '../../data/catalog.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { players: null, duration: null, age: null };
+const filters = { players: null, duration: null, age: null, q: '' };
 
 export function gameMatches(g, f = filters) {
   if (f.players != null) {
@@ -20,6 +21,7 @@ export function gameMatches(g, f = filters) {
   }
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
   if (f.age != null && g.minAge && g.minAge > f.age) return false;
+  if (f.q && !normalizeName(g.name).includes(normalizeName(f.q))) return false;
   return true;
 }
 
@@ -100,10 +102,35 @@ function randomPick(list) {
 
 export function gamesView() {
   const wrap = h('div');
+  const heroSub = h('small');
+  const results = h('div');
+  const search = h('input', {
+    class: 'input search', type: 'search', placeholder: '🔍 Rechercher un jeu…', value: filters.q,
+    'aria-label': 'Rechercher un jeu', autocomplete: 'off', enterkeyhint: 'search',
+    oninput: () => { filters.q = search.value; drawResults(); },
+  });
+  const filtered = () => sortedGames().filter((g) => gameMatches(g));
+
+  // Seule la liste est redessinée pendant la frappe : le champ garde le focus.
+  const drawResults = () => {
+    const all = sortedGames();
+    const list = filtered();
+    heroSub.textContent = list.length === all.length
+      ? `Tirage parmi vos ${plural(all.length, 'jeu', 'jeux')}`
+      : `Tirage parmi ${plural(list.length, 'jeu filtré', 'jeux filtrés')}`;
+    setChildren(results, list.length === 0
+      ? h('p', { class: 'muted center-text pad' }, 'Aucun jeu ne correspond.')
+      : h('ul', { class: 'game-grid' },
+          list.map((g) => h('li', null,
+            h('a', { class: 'game-card', href: `#/jeu/${g.id}` },
+              gameLogo(g, 72),
+              h('span', { class: 'game-name' }, g.name),
+              h('span', { class: 'game-meta' }, gameMeta(g)))))));
+  };
+
   const draw = () => {
     const all = sortedGames();
-    const list = all.filter((g) => gameMatches(g));
-    setChildren(wrap, 
+    setChildren(wrap,
       header('Ludothèque', {
         lead: h('a', { class: 'icon-btn', href: '#/des', 'aria-label': 'Lancer des dés' }, icon('dice')),
         actions: [h('a', { class: 'icon-btn', href: '#/jeu/nouveau', 'aria-label': 'Ajouter un jeu' }, icon('plus'))],
@@ -113,21 +140,15 @@ export function gamesView() {
             h('a', { class: 'btn primary big', href: '#/jeu/nouveau' }, icon('plus'), 'Ajouter un jeu'),
             h('button', { class: 'btn ghost', onclick: loadSamples }, 'Charger les exemples'))
         : [
-            h('button', { class: 'btn hero', onclick: () => randomPick(list) },
+            h('button', { class: 'btn hero', onclick: () => randomPick(filtered()) },
               h('span', { class: 'hero-emoji' }, '🎲'),
-              h('span', null, h('strong', null, 'À quoi joue-t-on ?'), h('small', null,
-                list.length === all.length ? `Tirage parmi vos ${plural(all.length, 'jeu', 'jeux')}` : `Tirage parmi ${plural(list.length, 'jeu filtré', 'jeux filtrés')}`))),
+              h('span', null, h('strong', null, 'À quoi joue-t-on ?'), heroSub)),
+            all.length > 8 && h('div', { class: 'pad-x' }, search),
             filterBar(draw),
-            list.length === 0
-              ? h('p', { class: 'muted center-text pad' }, 'Aucun jeu ne correspond à ces filtres.')
-              : h('ul', { class: 'game-grid' },
-                  list.map((g) => h('li', null,
-                    h('a', { class: 'game-card', href: `#/jeu/${g.id}` },
-                      gameLogo(g, 72),
-                      h('span', { class: 'game-name' }, g.name),
-                      h('span', { class: 'game-meta' }, gameMeta(g)))))),
+            results,
           ],
     );
+    drawResults();
   };
   draw();
   return wrap;

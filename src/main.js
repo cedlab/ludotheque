@@ -9,7 +9,9 @@ import { newSessionView, playView, sessionsView } from './ui/views/sessions.js';
 import { moreView } from './ui/views/more.js';
 import { diceView } from './ui/views/dice.js';
 import { openPicker } from './ui/picker.js';
-import { h } from './ui/dom.js';
+import { h, plural } from './ui/dom.js';
+import { toast } from './ui/components.js';
+import { CATALOG_VERSION, catalogToMerge } from './data/catalog.js';
 
 initTheme();
 registerServiceWorker();
@@ -42,4 +44,29 @@ route('/tirage', () => {
   };
 }, { tab: 'picker' });
 
-initStore().then(startRouter);
+const CATALOG_KEY = 'ludo.catalog';
+
+/** Ajoute les jeux de la maison (une fois par version du catalogue). */
+function applyCatalog(store) {
+  let applied = 0;
+  try {
+    applied = Number(localStorage.getItem(CATALOG_KEY)) || 0;
+  } catch {
+    /* stockage indisponible : on applique quand même, la fusion évite les doublons */
+  }
+  if (applied >= CATALOG_VERSION) return;
+  const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) }, 'catalog');
+  try {
+    localStorage.setItem(CATALOG_KEY, String(CATALOG_VERSION));
+  } catch {
+    /* ignoré */
+  }
+  if (stats.games.added > 0) {
+    setTimeout(() => toast(`${plural(stats.games.added, 'jeu de la maison ajouté', 'jeux de la maison ajoutés')} à la ludothèque.`), 600);
+  }
+}
+
+initStore().then((store) => {
+  applyCatalog(store);
+  startRouter();
+});

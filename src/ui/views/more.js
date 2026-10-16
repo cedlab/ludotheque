@@ -131,6 +131,8 @@ export function moreView() {
       h('button', { class: 'btn danger-ghost', onclick: async () => {
         if (!(await confirmDialog('Effacer toutes les données de CET appareil ? Pensez à faire une sauvegarde avant. Cette action est irréversible.', { ok: 'Tout effacer', danger: true }))) return;
         await store.clearAll();
+        // Au prochain lancement, les jeux de la maison seront de nouveau ajoutés.
+        try { localStorage.removeItem('ludo.catalog'); } catch { /* ignoré */ }
         toast('Données effacées.');
         refresh();
       } }, icon('trash'), 'Effacer les données de cet appareil')));

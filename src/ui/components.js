@@ -21,11 +21,16 @@ function hashString(s) {
 
 const LOGO_COLORS = ['#E8743B', '#2A9D8F', '#8E4EC6', '#E5484D', '#3E63DD', '#D49A00', '#30A46C', '#D6409F', '#0090FF', '#AD7F58'];
 
+const SMALL_WORDS = new Set(['le', 'la', 'les', 'l', 'un', 'une', 'des', 'du', 'de', 'd', 'et', 'en', 'au', 'aux', 'the', 'of', 'a', 'jeu']);
+
 export function initials(name = '') {
-  const words = name.trim().split(/[\s\-–_']+/).filter(Boolean);
-  if (words.length === 0) return '?';
-  if (words.length === 1) return [...words[0]].slice(0, 2).join('').toUpperCase();
-  return (([...words[0]][0] || '') + ([...words[1]][0] || '')).toUpperCase();
+  const all = name.trim().split(/[\s\-–_'’:!?.,()]+/).filter(Boolean);
+  if (all.length === 0) return '?';
+  // On ignore les petits mots (« Les Aventuriers du Rail » → A…R)
+  const words = all.filter((w) => !SMALL_WORDS.has(w.toLowerCase()));
+  const w = words.length ? words : all;
+  if (w.length === 1) return [...w[0]].slice(0, 2).join('').toUpperCase();
+  return (([...w[0]][0] || '') + ([...w[w.length - 1]][0] || '')).toUpperCase();
 }
 
 export function autoLogoColor(name) {
