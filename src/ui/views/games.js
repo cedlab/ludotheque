@@ -6,7 +6,7 @@ import { confirmDialog, emptyState, gameLogo, header, sheet, toast } from '../co
 import { describeScoring } from '../../logic/scoring.js';
 import { describeDice, normalizeDice } from '../../logic/dice.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
-import { sampleData } from '../../data/sample.js';
+import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
@@ -38,7 +38,7 @@ export function gameMeta(g) {
 export const sortedGames = () => store.list('games').sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 
 export function loadSamples() {
-  const stats = store.applyRemote(sampleData());
+  const stats = store.applyRemote(samplesFor(store.list('games'), normalizeName));
   toast(formatImportSummary(stats));
 }
 

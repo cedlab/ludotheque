@@ -51,4 +51,33 @@ describe('catalogue des jeux de la maison', () => {
     expect(store.get('games', azul.id).duration).toBe(45);
     expect(store.get('games', splendor.id)).toBeNull();
   });
+
+  it('les identifiants des premiers jeux sont stables (mise à jour du catalogue)', () => {
+    expect(games[0]).toMatchObject({ id: '00000000-0000-4000-8000-000000010001', name: 'Splendor' });
+    expect(games[53]).toMatchObject({ id: '00000000-0000-4000-8000-000000010054', name: 'Colorino' });
+  });
+
+  it('un téléphone qui avait la version 1 reçoit seulement les nouveaux jeux', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    store.applyRemote({ games: games.slice(0, 54) }); // état après la version 1
+    const azul = store.list('games').find((g) => g.name === 'Azul');
+    store.save('games', { ...azul, notes: 'Notre règle maison' });
+    const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
+    expect(stats.games).toMatchObject({ added: games.length - 54, updated: 0, deleted: 0 });
+    expect(store.get('games', azul.id).notes).toBe('Notre règle maison');
+  });
+
+  it('les exemples réutilisent les jeux du catalogue (pas de Skyjo en double)', async () => {
+    const { samplesFor } = await import('../src/data/sample.js');
+    const store = await new Store(new MemoryBackend()).init();
+    store.applyRemote({ games: catalogToMerge([]) });
+    store.applyRemote(samplesFor(store.list('games'), normalizeName));
+    const names = store.list('games').map((g) => normalizeName(g.name));
+    expect(names.filter((n) => n === 'skyjo')).toHaveLength(1);
+    expect(names.filter((n) => n === 'uno')).toHaveLength(1);
+    const skyjo = store.list('games').find((g) => g.name === 'Skyjo');
+    expect(store.list('sessions').filter((s) => s.gameId === skyjo.id)).toHaveLength(1);
+    expect(store.list('games')).toHaveLength(games.length + 2); // + Yams et Pandémie
+  });
 });
+

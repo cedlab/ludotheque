@@ -103,3 +103,24 @@ const sessions = [
 export function sampleData() {
   return structuredClone({ games, players, sessions });
 }
+
+/**
+ * Données d'exemple adaptées à la ludothèque existante : un jeu d'exemple déjà
+ * présent sous le même nom (ex. Skyjo du catalogue) n'est pas dupliqué, les
+ * parties d'exemple sont rattachées au jeu existant.
+ */
+export function samplesFor(existingGames = [], normalize = (s) => s.toLowerCase().trim()) {
+  const data = sampleData();
+  const byName = new Map(existingGames.filter((g) => !g.deleted).map((g) => [normalize(g.name), g.id]));
+  const remap = {};
+  data.games = data.games.filter((g) => {
+    const existing = byName.get(normalize(g.name));
+    if (existing && existing !== g.id) {
+      remap[g.id] = existing;
+      return false;
+    }
+    return true;
+  });
+  for (const s of data.sessions) if (remap[s.gameId]) s.gameId = remap[s.gameId];
+  return data;
+}

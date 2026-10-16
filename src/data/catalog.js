@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 1;
+export const CATALOG_VERSION = 2;
 const T = Date.UTC(2024, 0, 1);
 
 const sc = (mode, extra = {}) => ({
@@ -74,6 +74,43 @@ const GAMES = [
   ['Domino des p’tits incollables', 1, 4, 10, 1, COOP, { notes: 'Dès 18 mois.' }],
   ['Maman et ses petits', 1, 4, 10, 2, COOP],
   ['Colorino', 1, 4, 10, 2, COOP],
+  // Ajouts (version 2 du catalogue) — toujours à la fin : l'ordre fixe les identifiants.
+  ['Skyjo', 2, 8, 30, 8, sc('lowest', { rounds: true }), { notes: 'La partie s’arrête quand un joueur atteint 100 points. Le plus petit total gagne.' }],
+  ['La Guerre des Moutons', 2, 4, 30, 10, HIGH],
+  ['Speedbac', 2, 8, 20, 8, HIGH],
+  ['Odin', 2, 6, 15, 8, sc('lowest', { rounds: true }), { notes: 'Chaque carte restant en main à la fin d’une manche vaut 1 point. Le plus petit total gagne.' }],
+  ['Star Realms', 2, 2, 20, 12, sc('countdown', { startScore: 50, countdownWin: 'lastStanding' }), { notes: 'Chaque joueur commence avec 50 points d’influence.' }],
+  ['Boursicocotte', 3, 5, 30, 10, HIGH],
+  ['Texto!', 2, 6, 15, 8, HIGH],
+  ['Énigmes ? Monde animal', 1, 6, 20, 7, HIGH],
+  ['Énigmes ? Corps humain', 1, 6, 20, 7, HIGH],
+  ['Le Petit Bac', 2, 8, 30, 8, sc('highest', { rounds: true })],
+  ['Parade', 2, 6, 45, 10, sc('lowest'), { notes: 'Le plus petit total gagne.' }],
+  ['Dobble', 2, 8, 15, 6, HIGH, { notes: 'Plusieurs versions à la maison.' }],
+  ['Timeline', 2, 8, 15, 8, HIGH],
+  ['Speed Runners', 2, 4, 15, 8, HIGH],
+  ['Cortex Challenge', 2, 6, 15, 8, HIGH],
+  ['Médiévallons', 2, 5, 20, 8, HIGH],
+  ['Bazar Bizarre 2.0', 2, 8, 20, 8, HIGH],
+  ['Codex Naturalis', 2, 4, 20, 7, HIGH],
+  ['Bandido', 1, 4, 15, 6, COOP],
+  ['De l’Orc pour les Braves', 2, 4, 15, 8, HIGH],
+  ['Taboo XXL', 4, 10, 30, 12, sc('highest', { teams: true })],
+  ['Sea Salt & Paper', 2, 4, 30, 8, sc('target', { target: 40, rounds: true }), { notes: 'Score à atteindre selon le nombre de joueurs : 40 à 2, 35 à 3, 30 à 4.' }],
+  ['Trio', 3, 6, 15, 7, HIGH],
+  ['Taco Loco', 2, 6, 15, 8, HIGH],
+  ['That’s Not a Hat', 3, 8, 15, 8, sc('lowest'), { notes: 'Le moins de cartes pénalité l’emporte.' }],
+  ['Service Compris !', 3, 6, 30, 10, HIGH],
+  ['The Line', 2, 8, 15, 10, HIGH],
+  ['Les Bâtisseurs : Moyen-Âge', 1, 4, 30, 10, HIGH],
+  ['Similo : Animaux sauvages', 2, 8, 10, 7, COOP],
+  ['Jeu de 32 cartes', 2, 6, 30, 8, HIGH, { notes: 'Belote, bataille, huit américain…' }],
+  ['L’Imposteur', 3, 10, 20, 10, HIGH],
+  ['Uno', 2, 10, 20, 7, sc('target', { target: 500, rounds: true }), { notes: 'Le gagnant d’une manche marque les points des cartes restant chez les autres.' }],
+  ['One Piece : Deviens le roi des pirates', 2, 6, 30, 8, HIGH],
+  ['Loup-Garou pour une nuit', 3, 10, 10, 9, HIGH],
+  ['Duck & Cover', 2, 6, 20, 8, HIGH],
+  ['The Crew : en quête de la neuvième planète', 2, 5, 20, 10, COOP],
 ];
 
 const pad = (n) => String(n).padStart(4, '0');
