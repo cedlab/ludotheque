@@ -1599,61 +1599,67 @@ html.picker-open body {
   background: color-mix(in srgb, var(--primary) 16%, var(--surface));
 }
 .dice-tray {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
-  min-height: 120px;
-  margin: 6px 16px 10px;
-  padding: 22px 12px;
+  position: relative;
+  height: 280px;
+  margin: 6px 16px 8px;
   border-radius: var(--radius);
+  overflow: hidden;
   background:
-    radial-gradient(circle at 50% 30%, rgb(255 255 255 / 10%), transparent 60%),
+    radial-gradient(circle at 50% 35%, rgb(255 255 255 / 12%), transparent 65%),
     linear-gradient(160deg, #2f7d5b, #1f5c42);
-  box-shadow: inset 0 4px 18px rgb(0 0 0 / 35%), var(--shadow);
+  box-shadow: inset 0 0 0 6px #6b4226, inset 0 6px 22px rgb(0 0 0 / 45%), var(--shadow);
+  touch-action: manipulation;
 }
 .die {
-  position: relative;
+  --lift: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
   display: grid;
   place-items: center;
-  width: 72px;
-  height: 72px;
-  padding: 10px;
+  padding: 9px;
   border: 0;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #fffdf8, #f0e6d8);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #fffdf8, #efe3d2);
   color: #2d1f16;
-  box-shadow: 0 6px 0 #c9b8a2, 0 10px 16px rgb(0 0 0 / 35%);
-  transform: rotate(var(--tilt));
+  box-shadow:
+    inset 0 -4px 0 rgb(0 0 0 / 10%),
+    0 calc(4px + var(--lift) * 16px) calc(8px + var(--lift) * 22px) rgb(0 0 0 / calc(0.4 - var(--lift) * 0.15));
+  will-change: transform;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
 }
 .die:disabled {
   cursor: default;
 }
-.die.blank {
-  opacity: 0.55;
+.die.resting {
+  transition: transform 0.28s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.die-face {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
 }
 .die.held {
-  transform: rotate(0deg) translateY(4px);
-  box-shadow: 0 2px 0 #c9b8a2, 0 0 0 4px var(--sun), 0 6px 12px rgb(0 0 0 / 30%);
-}
-.die.rolling {
-  animation: tumble 0.18s linear infinite;
-}
-.die.dn {
-  border-radius: 50% 50% 18px 18px;
-}
-.die-num {
-  font-size: 1.9rem;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 4px var(--sun), 0 4px 10px rgb(0 0 0 / 35%);
 }
 .die-lock {
   position: absolute;
   top: -10px;
   right: -10px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  display: none;
+}
+.die.held .die-lock {
+  display: block;
+}
+.die.dn {
+  border-radius: 50% 50% 16px 16px;
+}
+.die-num {
+  font-size: 1.9rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
 }
 .pips {
   display: grid;
@@ -1668,30 +1674,36 @@ html.picker-open body {
 }
 .pips .pip::after {
   content: '';
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #2d1f16;
 }
 .dice-total {
-  flex-basis: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 64px;
-  color: #fff;
-  text-shadow: 0 2px 6px rgb(0 0 0 / 35%);
+  min-width: 64px;
+  line-height: 1;
 }
 .dice-total strong {
-  font-size: 2.6rem;
+  color: var(--text);
+  font-size: 1.9rem;
   font-weight: 900;
-  line-height: 1;
-  animation: pop 0.35s ease-out;
+  font-variant-numeric: tabular-nums;
 }
 .dice-total small {
-  color: rgb(255 255 255 / 80%);
+  color: var(--muted);
   font-weight: 700;
+  font-size: 0.75rem;
+}
+.dice-total .pop-in {
+  animation: pop 0.35s ease-out;
+}
+.dice-settings {
+  padding: 12px 16px;
+  gap: 8px;
 }
 .dice-faces {
   flex-wrap: nowrap;
@@ -1709,15 +1721,4 @@ html.picker-open body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-@keyframes tumble {
-  0% {
-    transform: rotate(-14deg) translateY(-3px);
-  }
-  50% {
-    transform: rotate(12deg) translateY(2px);
-  }
-  100% {
-    transform: rotate(-14deg) translateY(-3px);
-  }
 }
