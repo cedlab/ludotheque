@@ -5,7 +5,7 @@ C'est une application web installable (PWA) qui fonctionne **hors ligne**.
 
 👉 **https://cedlab.github.io/ludotheque/**
 
-- **Collection de jeux** : fiche par jeu (logo photo ou icône automatique, nombre de joueurs, durée, âge, type de score, notes). Filtres par nombre de joueurs, durée et âge, et bouton **« Que joue-t-on ? »** qui tire un jeu au hasard.
+- **Collection de jeux** : fiche par jeu (logo photo ou icône automatique, nombre de joueurs, durée, âge, type de score, notes). Filtres par nombre de joueurs, durée et âge, et bouton **« À quoi joue-t-on ? »** qui tire un jeu au hasard.
 - **Tirage au doigt** : chacun pose un doigt sur l'écran. Après environ 2 s d'immobilité, un compte à rebours démarre, puis un doigt est désigné au hasard. On peut aussi tirer l'ordre complet de jeu ou former des équipes.
 - **Scores** : le plus haut gagne, le plus bas gagne, score de départ décompté (501, 20 PV… ; le premier à 0 gagne ou le dernier en vie), score cible, coopératif, par équipes. Saisie manche par manche ou score final, gestion des égalités. Les gros boutons +/- s'utilisent d'une main.
 - **Historique et statistiques** : victoires par joueur, jeux les plus joués, meilleur score par jeu, séries de victoires.

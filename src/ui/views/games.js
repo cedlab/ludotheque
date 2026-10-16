@@ -1,4 +1,4 @@
-// Collection de jeux : liste, filtres, tirage « Que joue-t-on ? », fiche.
+// Collection de jeux : liste, filtres, tirage « À quoi joue-t-on ? », fiche.
 import { store, navigate } from '../../app.js';
 import { h, plural, secureRandom, vibrate, formatDate, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
@@ -75,7 +75,7 @@ function randomPick(list) {
     h('div', { class: 'row gap' },
       h('button', { class: 'btn ghost grow', onclick: () => { s.close(); navigate(`/jeu/${chosen.id}`); } }, 'Voir la fiche'),
       list.length > 1 && h('button', { class: 'btn ghost grow', onclick: () => { s.close(); randomPick(list); } }, icon('shuffle'), 'Relancer')));
-  const s = sheet(h('div', { class: 'stack center' }, stage, title, actions), { title: 'Que joue-t-on ?' });
+  const s = sheet(h('div', { class: 'stack center' }, stage, title, actions), { title: 'À quoi joue-t-on ?' });
 
   // Petite animation de « roulette » qui ralentit avant de s'arrêter.
   let i = 0;
@@ -115,7 +115,7 @@ export function gamesView() {
         : [
             h('button', { class: 'btn hero', onclick: () => randomPick(list) },
               h('span', { class: 'hero-emoji' }, '🎲'),
-              h('span', null, h('strong', null, 'Que joue-t-on ?'), h('small', null,
+              h('span', null, h('strong', null, 'À quoi joue-t-on ?'), h('small', null,
                 list.length === all.length ? `Tirage parmi vos ${plural(all.length, 'jeu', 'jeux')}` : `Tirage parmi ${plural(list.length, 'jeu filtré', 'jeux filtrés')}`))),
             filterBar(draw),
             list.length === 0
