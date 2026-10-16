@@ -38,10 +38,13 @@ export function registerServiceWorker() {
   if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return;
   const base = import.meta.env.BASE_URL;
 
-  let refreshing = false;
+  // On ne recharge que si l'utilisateur a demandé la mise à jour. Lors de la
+  // toute première installation, le service worker prend aussi le contrôle
+  // (clients.claim) : recharger à ce moment-là ferait « sauter » l'écran.
+  let updateRequested = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (refreshing) return;
-    refreshing = true;
+    if (!updateRequested) return;
+    updateRequested = false;
     location.reload();
   });
 
@@ -49,7 +52,10 @@ export function registerServiceWorker() {
     toast('Une nouvelle version de la Ludothèque est disponible.', {
       action: 'Mettre à jour',
       duration: 0,
-      onAction: () => worker.postMessage('SKIP_WAITING'),
+      onAction: () => {
+        updateRequested = true;
+        worker.postMessage('SKIP_WAITING');
+      },
     });
   };
 
