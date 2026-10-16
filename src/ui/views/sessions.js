@@ -12,7 +12,7 @@ import { computeStats, filterHistory, sessionWinners } from '../../logic/stats.j
 import { TEAM_COLORS, TEAM_NAMES } from '../../logic/picker-engine.js';
 import { openPicker } from '../picker.js';
 import { editPlayer, sortedPlayers, statTile } from './players.js';
-import { gameMeta, sortedGames } from './games.js';
+import { diceHref, gameMeta, sortedGames } from './games.js';
 import { uuid } from '../../data/records.js';
 
 // --- Aides ---------------------------------------------------------------------
@@ -429,7 +429,10 @@ export function playView({ id }) {
     setChildren(wrap, 
       header(liveGameName(s), {
         back: '#/parties',
-        actions: [h('button', { class: 'icon-btn', 'aria-label': 'Tirage au doigt', onclick: () => openPicker() }, icon('hand'))],
+        actions: [
+          h('a', { class: 'icon-btn', href: diceHref(store.get('games', s.gameId), `/partie/${id}`), 'aria-label': 'Lancer des dés' }, icon('dice')),
+          h('button', { class: 'icon-btn', 'aria-label': 'Tirage au doigt', onclick: () => openPicker() }, icon('hand')),
+        ],
       }),
       h('p', { class: 'muted small center-text' }, describeScoring(sc)),
       banner,

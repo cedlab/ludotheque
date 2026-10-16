@@ -4,6 +4,7 @@ import { h, plural, secureRandom, vibrate, formatDate, setChildren } from '../do
 import { icon } from '../icons.js';
 import { confirmDialog, emptyState, gameLogo, header, sheet, toast } from '../components.js';
 import { describeScoring } from '../../logic/scoring.js';
+import { describeDice, normalizeDice } from '../../logic/dice.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { sampleData } from '../../data/sample.js';
 import { formatImportSummary } from '../../data/merge.js';
@@ -104,6 +105,7 @@ export function gamesView() {
     const list = all.filter((g) => gameMatches(g));
     setChildren(wrap, 
       header('Ludothèque', {
+        lead: h('a', { class: 'icon-btn', href: '#/des', 'aria-label': 'Lancer des dés' }, icon('dice')),
         actions: [h('a', { class: 'icon-btn', href: '#/jeu/nouveau', 'aria-label': 'Ajouter un jeu' }, icon('plus'))],
       }),
       all.length === 0
@@ -160,9 +162,11 @@ export function gameDetailView({ id }) {
         fact('users', g.minPlayers === g.maxPlayers ? `${g.minPlayers} joueurs` : `${g.minPlayers || 1} à ${g.maxPlayers || '∞'} joueurs`),
         g.duration ? fact('clock', `${g.duration} min`) : null,
         g.minAge ? fact('cake', `Dès ${g.minAge} ans`) : null,
-        fact('trophy', describeScoring(g.scoring)))),
+        fact('trophy', describeScoring(g.scoring)),
+        normalizeDice(g.dice) && fact('dice', `Dés : ${describeDice(normalizeDice(g.dice))}`))),
     h('div', { class: 'stack pad-x' },
-      h('a', { class: 'btn primary big', href: `#/partie/nouvelle?jeu=${id}` }, icon('play'), 'Lancer une partie')),
+      h('a', { class: 'btn primary big', href: `#/partie/nouvelle?jeu=${id}` }, icon('play'), 'Lancer une partie'),
+      normalizeDice(g.dice) && h('a', { class: 'btn big', href: diceHref(g, `/jeu/${id}`) }, icon('dice'), `Lancer les dés (${describeDice(normalizeDice(g.dice))})`)),
     g.notes && h('section', { class: 'card' }, h('h3', null, 'Notes'), h('p', { class: 'notes' }, g.notes)),
     h('section', { class: 'card' },
       h('h3', null, 'Historique'),
@@ -179,4 +183,17 @@ export function gameDetailView({ id }) {
 
 function fact(ic, text) {
   return h('div', { class: 'fact' }, icon(ic, 20), h('span', null, text));
+}
+
+/** Lien vers l'écran des dés, avec la configuration du jeu s'il en a une. */
+export function diceHref(game, retour) {
+  const d = normalizeDice(game?.dice);
+  const q = new URLSearchParams();
+  if (d) {
+    q.set('n', d.count);
+    q.set('f', d.faces);
+  }
+  if (retour) q.set('retour', retour);
+  const qs = q.toString();
+  return `#/des${qs ? `?${qs}` : ''}`;
 }

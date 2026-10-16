@@ -5,6 +5,7 @@ import { icon } from '../icons.js';
 import { gameLogo, header, stepper, toast } from '../components.js';
 import { COUNTDOWN_WIN, MODES, MODE_LABELS, defaultScoring, normalizeScoring } from '../../logic/scoring.js';
 import { cropImage, pickImageFile } from '../image.js';
+import { DICE_FACES, MAX_DICE, normalizeDice } from '../../logic/dice.js';
 
 const MODE_HELP = {
   highest: 'Le total le plus élevé l’emporte (Yams, Scrabble…).',
@@ -95,6 +96,23 @@ export function gameFormView({ id }) {
   };
   renderScoring();
 
+  // Dés utilisés par le jeu (facultatif)
+  g.dice = normalizeDice(g.dice);
+  const diceBox = h('div', { class: 'stack' });
+  const renderDice = () => {
+    setChildren(diceBox,
+      h('label', { class: 'toggle' },
+        h('input', { type: 'checkbox', checked: !!g.dice, onchange: (e) => { g.dice = e.target.checked ? { count: 2, faces: 6 } : null; renderDice(); } }),
+        h('span', { class: 'toggle-ui' }),
+        h('span', { class: 'toggle-text' }, h('strong', null, 'Ce jeu se joue avec des dés'),
+          h('small', null, 'Le lanceur de dés s’ouvrira avec ce réglage pendant les parties.'))),
+      g.dice && h('div', { class: 'field-row' }, h('span', null, 'Nombre de dés'),
+        stepper({ value: g.dice.count, min: 1, max: MAX_DICE, label: 'Nombre de dés', onchange: (v) => (g.dice.count = v) })),
+      g.dice && h('div', { class: 'chips dice-faces' }, DICE_FACES.map((f) =>
+        h('button', { type: 'button', class: `chip ${g.dice.faces === f ? 'on' : ''}`, onclick: () => { g.dice.faces = f; renderDice(); } }, `D${f}`))));
+  };
+  renderDice();
+
   const notes = h('textarea', { class: 'input', rows: '4', placeholder: 'Règles maison, rappels, extensions…',
     oninput: () => (g.notes = notes.value) }, g.notes || '');
 
@@ -121,6 +139,7 @@ export function gameFormView({ id }) {
       h('div', { class: 'field-row' }, h('span', null, 'Durée'), durationStep),
       h('div', { class: 'field-row' }, h('span', null, 'Âge minimum'), ageStep)),
     h('section', { class: 'card stack' }, h('h3', null, 'Comptage des points'), scoringBox),
+    h('section', { class: 'card stack' }, h('h3', null, 'Dés'), diceBox),
     h('section', { class: 'card stack' }, h('h3', null, 'Notes'), notes),
     h('div', { class: 'sticky-actions' },
       h('button', { type: 'button', class: 'btn ghost', onclick: () => back(existing ? `/jeu/${existing.id}` : '/') }, 'Annuler'),

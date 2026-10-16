@@ -37,7 +37,7 @@ const games = [
     notes: 'La partie s’arrête quand un joueur dépasse 100 points. Le plus petit total gagne.',
   },
   {
-    ...base(G.yams, 11), name: 'Yams', logo: null, minPlayers: 1, maxPlayers: 6, duration: 30, minAge: 7,
+    ...base(G.yams, 100), name: 'Yams', dice: { count: 5, faces: 6 }, logo: null, minPlayers: 1, maxPlayers: 6, duration: 30, minAge: 7,
     scoring: scoring({ mode: 'highest' }),
     notes: '5 dés, 3 lancers par tour. Bonus de 35 points si la partie haute atteint 63.',
   },

@@ -207,11 +207,11 @@ export function emptyState(emoji, title, text, ...actions) {
     actions.length > 0 && h('div', { class: 'stack' }, actions));
 }
 
-export function header(title, { back, actions = [] } = {}) {
+export function header(title, { back, lead, actions = [] } = {}) {
   return h('header', { class: 'topbar' },
     back
       ? h('a', { class: 'icon-btn', href: back, 'aria-label': 'Retour' }, icon('back'))
-      : h('span', { class: 'topbar-spacer' }),
+      : h('span', { class: 'topbar-spacer' }, lead),
     h('h1', null, title),
     h('div', { class: 'topbar-actions' }, actions));
 }

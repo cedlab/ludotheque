@@ -9,6 +9,7 @@ C'est une application web installable (PWA) qui fonctionne **hors ligne**.
 - **Tirage au doigt** : chacun pose un doigt sur l'écran. Après environ 2 s d'immobilité, un compte à rebours démarre, puis un doigt est désigné au hasard. On peut aussi tirer l'ordre complet de jeu ou former des équipes.
 - **Scores** : le plus haut gagne, le plus bas gagne, score de départ décompté (501, 20 PV… ; le premier à 0 gagne ou le dernier en vie), score cible, coopératif, par équipes. Saisie manche par manche ou score final, gestion des égalités. Les gros boutons +/- s'utilisent d'une main.
 - **Historique et statistiques** : victoires par joueur, jeux les plus joués, meilleur score par jeu, séries de victoires.
+- **Lanceur de dés** : de 1 à 12 dés (D4, D6, D8, D10, D12, D20, D100). On touche un dé pour le garder au lancer suivant. Le total et l'historique s'affichent. Chaque jeu peut avoir son réglage (« Yams : 5 × D6 »).
 - **Partage entre téléphones** par fichier, avec une fusion intelligente qui n'écrase jamais rien. Ce fichier sert aussi de sauvegarde.
 
 Aucun compte, aucun serveur : les données restent sur le téléphone (IndexedDB).
@@ -24,7 +25,8 @@ Aucun compte, aucun serveur : les données restent sur le téléphone (IndexedDB
    - En mode manche par manche, utilisez **Manche suivante**. **Manches** affiche le tableau détaillé, dont chaque case est modifiable.
    - Un bandeau annonce le gagnant dès que la condition de victoire est atteinte (cible, 0 point, dernier survivant).
    - **Terminer** affiche le podium. Depuis l'écran des résultats : **Rejouer**, **Corriger les scores** ou **Supprimer**.
-4. **Tirage** (bouton central) : posez tous un doigt sur l'écran et ne bougez plus. Si un doigt est levé, ajouté ou déplacé, le tirage recommence. Les modes **Premier joueur**, **Ordre** et **Équipes** (2 à 4) se choisissent en haut de l'écran. Le tirage accepte autant de doigts que l'écran en détecte (5 sur iPhone, souvent 10 sur Android).
+4. **Dés** : bouton 🎲 en haut à gauche de l'accueil, dans la fiche d'un jeu ou pendant une partie (réglage du jeu par défaut). Touchez un dé pour le garder, 🔒 apparaît.
+5. **Tirage** (bouton central) : posez tous un doigt sur l'écran et ne bougez plus. Si un doigt est levé, ajouté ou déplacé, le tirage recommence. Les modes **Premier joueur**, **Ordre** et **Équipes** (2 à 4) se choisissent en haut de l'écran. Le tirage accepte autant de doigts que l'écran en détecte (5 sur iPhone, souvent 10 sur Android).
 
 ### Comment les scores sont calculés
 

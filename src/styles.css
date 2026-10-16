@@ -1591,3 +1591,133 @@ html.picker-open body {
     border-radius: 28px;
   }
 }
+
+/* --- Dés ------------------------------------------------------------------- */
+
+.dice-faces .chip.on {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 16%, var(--surface));
+}
+.dice-tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  min-height: 120px;
+  margin: 6px 16px 10px;
+  padding: 22px 12px;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 50% 30%, rgb(255 255 255 / 10%), transparent 60%),
+    linear-gradient(160deg, #2f7d5b, #1f5c42);
+  box-shadow: inset 0 4px 18px rgb(0 0 0 / 35%), var(--shadow);
+}
+.die {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  padding: 10px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fffdf8, #f0e6d8);
+  color: #2d1f16;
+  box-shadow: 0 6px 0 #c9b8a2, 0 10px 16px rgb(0 0 0 / 35%);
+  transform: rotate(var(--tilt));
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.die:disabled {
+  cursor: default;
+}
+.die.blank {
+  opacity: 0.55;
+}
+.die.held {
+  transform: rotate(0deg) translateY(4px);
+  box-shadow: 0 2px 0 #c9b8a2, 0 0 0 4px var(--sun), 0 6px 12px rgb(0 0 0 / 30%);
+}
+.die.rolling {
+  animation: tumble 0.18s linear infinite;
+}
+.die.dn {
+  border-radius: 50% 50% 18px 18px;
+}
+.die-num {
+  font-size: 1.9rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.die-lock {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.1rem;
+}
+.pips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+}
+.pips span {
+  display: grid;
+  place-items: center;
+}
+.pips .pip::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2d1f16;
+}
+.dice-total {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 35%);
+}
+.dice-total strong {
+  font-size: 2.6rem;
+  font-weight: 900;
+  line-height: 1;
+  animation: pop 0.35s ease-out;
+}
+.dice-total small {
+  color: rgb(255 255 255 / 80%);
+  font-weight: 700;
+}
+.dice-faces {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dice-faces::-webkit-scrollbar {
+  display: none;
+}
+.dice-hist-type {
+  min-width: 64px;
+}
+.dice-hist-values {
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes tumble {
+  0% {
+    transform: rotate(-14deg) translateY(-3px);
+  }
+  50% {
+    transform: rotate(12deg) translateY(2px);
+  }
+  100% {
+    transform: rotate(-14deg) translateY(-3px);
+  }
+}

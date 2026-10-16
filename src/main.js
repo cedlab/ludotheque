@@ -7,6 +7,7 @@ import { gameFormView } from './ui/views/game-form.js';
 import { playerDetailView, playersView } from './ui/views/players.js';
 import { newSessionView, playView, sessionsView } from './ui/views/sessions.js';
 import { moreView } from './ui/views/more.js';
+import { diceView } from './ui/views/dice.js';
 import { openPicker } from './ui/picker.js';
 import { h } from './ui/dom.js';
 
@@ -23,6 +24,7 @@ route('/partie/:id', playView, { tab: 'sessions' });
 route('/joueurs', playersView, { tab: 'players' });
 route('/joueur/:id', playerDetailView, { tab: 'players' });
 route('/plus', moreView, { tab: 'more' });
+route('/des', diceView, { tab: 'games' });
 route('/tirage', () => {
   // Écran plein écran ; en le fermant on revient à la page précédente.
   let closedByRoute = false;
