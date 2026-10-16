@@ -1,0 +1,23 @@
+{
+  "name": "ludotheque",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ludothèque familiale : collection de jeux, tirage du premier joueur, scores et statistiques (PWA hors ligne).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}
