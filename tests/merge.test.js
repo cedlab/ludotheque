@@ -198,4 +198,32 @@ describe('Store (fusion + persistance)', () => {
     store.applyRemote({ ...empty(), games: [rec('g', 1)] }); // distant : pas renvoyé
     expect(seen).toEqual([['players', 1]]);
   });
+
+  it('joueur supprimé par erreur : l’import le signale, la corbeille le restaure partout', async () => {
+    const wife = await new Store(new MemoryBackend()).init();
+    const maxou = wife.save('players', { name: 'Maxou' });
+    const file = JSON.stringify(wife.exportData());
+
+    const me = await new Store(new MemoryBackend()).init();
+    me.importText(file);
+    await new Promise((r) => setTimeout(r, 2));
+    me.remove('players', maxou.id); // suppression par erreur
+
+    const again = me.importText(file);
+    expect(me.get('players', maxou.id)).toBeNull(); // la suppression, plus récente, l’emporte
+    expect(formatImportSummary(again)).toBe('1 joueur resté supprimé (Plus → Corbeille pour restaurer)');
+
+    me.restore('players', maxou.id);
+    expect(me.get('players', maxou.id).name).toBe('Maxou');
+    expect(formatImportSummary(me.importText(file))).toMatch(/Rien de nouveau/);
+
+    // Propagation : un troisième téléphone qui avait reçu la suppression récupère Maxou.
+    const other = await new Store(new MemoryBackend()).init();
+    other.importText(file);
+    other.applyRemote({ players: [{ ...maxou, deleted: true, updatedAt: maxou.updatedAt + 1 }] }); // reçoit la suppression
+    expect(other.get('players', maxou.id)).toBeNull();
+    expect(formatImportSummary(other.importText(JSON.stringify(me.exportData())))).toBe('1 joueur mis à jour');
+    expect(other.get('players', maxou.id).name).toBe('Maxou');
+  });
 });
+

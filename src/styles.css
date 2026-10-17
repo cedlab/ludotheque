@@ -1746,3 +1746,8 @@ html.picker-open body {
 .emoji-grid.icons {
   grid-template-columns: repeat(8, 1fr);
 }
+
+.col {
+  display: flex;
+  flex-direction: column;
+}

@@ -8,6 +8,7 @@ import { playerDetailView, playersView } from './ui/views/players.js';
 import { newSessionView, playView, sessionsView } from './ui/views/sessions.js';
 import { moreView } from './ui/views/more.js';
 import { diceView } from './ui/views/dice.js';
+import { trashView } from './ui/views/trash.js';
 import { openPicker } from './ui/picker.js';
 import { h, plural } from './ui/dom.js';
 import { toast } from './ui/components.js';
@@ -27,6 +28,7 @@ route('/joueurs', playersView, { tab: 'players' });
 route('/joueur/:id', playerDetailView, { tab: 'players' });
 route('/plus', moreView, { tab: 'more' });
 route('/des', diceView, { tab: 'games' });
+route('/corbeille', trashView, { tab: 'more' });
 route('/tirage', () => {
   // Écran plein écran ; en le fermant on revient à la page précédente.
   let closedByRoute = false;

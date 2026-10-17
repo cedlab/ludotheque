@@ -6,6 +6,7 @@ import { confirmDialog, header, segmented, sheet, toast } from '../components.js
 import { exportFileName } from '../../data/exchange.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { loadSamples } from './games.js';
+import { deletedCount } from './trash.js';
 import { canPromptInstall, checkForUpdate, isIOS, isStandalone, onInstallAvailable, promptInstall } from '../../pwa.js';
 import { applyTheme, getTheme } from '../../theme.js';
 
@@ -109,6 +110,10 @@ export function moreView() {
       h('button', { class: 'btn primary big', onclick: shareLibrary }, icon('share'), 'Partager ma ludothèque'),
       h('button', { class: 'btn big', onclick: importLibrary }, icon('download'), 'Importer un fichier reçu'),
       h('p', { class: 'muted small' }, `Contenu : ${plural(s.games.length, 'jeu', 'jeux')}, ${plural(s.players.length, 'joueur', 'joueurs')}, ${plural(s.sessions.length, 'partie', 'parties')}.`)),
+    h('section', { class: 'card stack' },
+      h('h3', null, '🗑️ Corbeille'),
+      h('p', { class: 'muted' }, 'Un joueur, un jeu ou une partie supprimé par erreur ? Restaurez-le ici.'),
+      h('a', { class: 'btn', href: '#/corbeille' }, `Ouvrir la corbeille (${deletedCount()})`)),
     h('section', { class: 'card stack' },
       h('h3', null, '💾 Sauvegarde'),
       h('p', { class: 'muted' }, 'Le fichier partagé sert aussi de sauvegarde complète. Gardez-en une copie (Fichiers, Drive, mail…) et réimportez-la sur un nouveau téléphone.'),

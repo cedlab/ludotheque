@@ -52,7 +52,8 @@ export function pickWinner(local, incoming) {
 export function mergeCollection(localList = [], incomingList = []) {
   const local = new Map(localList.map((r) => [r.id, r]));
   const changes = new Map();
-  const stats = { added: 0, updated: 0, deleted: 0, ignored: 0 };
+  const stats = { added: 0, updated: 0, deleted: 0, ignored: 0, keptDeleted: 0 };
+  const keptDeleted = new Set();
 
   for (const incoming of incomingList) {
     if (!isValidRecord(incoming)) {
@@ -61,7 +62,11 @@ export function mergeCollection(localList = [], incomingList = []) {
     }
     const current = changes.get(incoming.id) ?? local.get(incoming.id);
     const winner = pickWinner(current, incoming);
-    if (winner === current) continue;
+    if (winner === current) {
+      // Supprimé ici plus récemment que la version reçue : la suppression l'emporte.
+      if (current?.deleted && !incoming.deleted && current === local.get(incoming.id)) keptDeleted.add(incoming.id);
+      continue;
+    }
     if (current && stableStringify(current) === stableStringify(incoming)) continue;
     changes.set(incoming.id, incoming);
   }
@@ -77,6 +82,7 @@ export function mergeCollection(localList = [], incomingList = []) {
     }
   }
 
+  for (const id of keptDeleted) if (!changes.has(id)) stats.keptDeleted++;
   return { changes: [...changes.values()], stats };
 }
 
@@ -134,6 +140,8 @@ export function formatImportSummary(stats) {
     phrase(stats, 'updated', { ms: 'mis à jour', mp: 'mis à jour', fs: 'mise à jour', fp: 'mises à jour' }),
     phrase(stats, 'deleted', { ms: 'supprimé', mp: 'supprimés', fs: 'supprimée', fp: 'supprimées' }),
   ].filter(Boolean);
+  const kept = phrase(stats, 'keptDeleted', { ms: 'resté supprimé', mp: 'restés supprimés', fs: 'restée supprimée', fp: 'restées supprimées' });
+  if (kept) sentences.push(`${kept} (Plus → Corbeille pour restaurer)`);
   if (sentences.length === 0) return 'Rien de nouveau : votre ludothèque était déjà à jour.';
   return sentences.join(' · ');
 }

@@ -66,6 +66,15 @@ export class Store {
     this.#write(col, [tombstone(prev)], 'local');
   }
 
+  /** Restaure un élément supprimé (plus récent que la suppression : se propage aussi). */
+  restore(col, id) {
+    const prev = this.data[col].get(id);
+    if (!prev || !prev.deleted) return null;
+    const rec = touchRecord(prev, { deleted: false });
+    this.#write(col, [rec], 'local');
+    return rec;
+  }
+
   #write(col, records, source) {
     for (const r of records) this.data[col].set(r.id, r);
     this.pending = this.pending
