@@ -7,12 +7,22 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 3;
+export const CATALOG_VERSION = 4;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
 // vignette ; un jeu modifié depuis (date plus récente) garde sa version.
 const REVISED = Date.UTC(2024, 1, 1);
+// v4 : jeux retirés de la maison. Ils restent dans la liste (leur position fixe
+// les identifiants des suivants) mais sont publiés comme supprimés, ce qui les
+// retire aussi des téléphones qui les avaient déjà.
+const REMOVED_AT = Date.UTC(2024, 2, 1);
+const REMOVED = new Set([
+  'Mon premier jeu de parcours', 'Comme des petits singes', 'Premier jeu d’association (Nathan)',
+  'Une cuillère pour Martin', 'Loto des p’tits incollables', 'Domino des p’tits incollables',
+  'Maman et ses petits', 'Colorino', 'Énigmes ? Monde animal', 'Énigmes ? Corps humain',
+  'Jeu de 32 cartes', 'One Piece : Deviens le roi des pirates',
+]);
 
 const sc = (mode, extra = {}) => ({
   mode, teams: false, rounds: false, startScore: 20, countdownWin: 'lastStanding',
@@ -162,7 +172,7 @@ export function catalogGames() {
     icon: ICONS[name] || null,
     notes: '',
     ...structuredClone(extra),
-  }));
+  })).map((g) => (REMOVED.has(g.name) ? { ...g, deleted: true, updatedAt: REMOVED_AT } : g));
 }
 
 /** Nom simplifié pour repérer un même jeu saisi à la main (accents, ponctuation…). */
@@ -182,5 +192,6 @@ export function normalizeName(name = '') {
 export function catalogToMerge(existingGames = []) {
   const ownIds = new Set(existingGames.map((g) => g.id));
   const names = new Set(existingGames.filter((g) => !g.deleted).map((g) => normalizeName(g.name)));
-  return catalogGames().filter((g) => ownIds.has(g.id) || !names.has(normalizeName(g.name)));
+  // Les jeux retirés (supprimés) passent toujours : leur suppression doit se propager.
+  return catalogGames().filter((g) => g.deleted || ownIds.has(g.id) || !names.has(normalizeName(g.name)));
 }

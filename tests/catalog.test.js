@@ -8,6 +8,7 @@ import { sampleData } from '../src/data/sample.js';
 
 describe('catalogue des jeux de la maison', () => {
   const games = catalogGames();
+  const active = games.filter((g) => !g.deleted);
 
   it('fiches valides, identifiants et noms uniques', () => {
     expect(games.length).toBeGreaterThan(40);
@@ -41,7 +42,7 @@ describe('catalogue des jeux de la maison', () => {
   it('s’applique sans doublon, et respecte les modifications et suppressions', async () => {
     const store = await new Store(new MemoryBackend()).init();
     const first = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
-    expect(first.games.added).toBe(games.length);
+    expect(first.games.added).toBe(active.length);
     const azul = store.list('games').find((g) => g.name === 'Azul');
     store.save('games', { ...azul, duration: 45 });
     const splendor = store.list('games').find((g) => g.name === 'Splendor');
@@ -59,11 +60,13 @@ describe('catalogue des jeux de la maison', () => {
 
   it('un téléphone qui avait la version 1 reçoit seulement les nouveaux jeux', async () => {
     const store = await new Store(new MemoryBackend()).init();
-    store.applyRemote({ games: games.slice(0, 54) }); // état après la version 1
+    // État après la version 1 : les 54 premiers jeux, tous présents
+    store.applyRemote({ games: games.slice(0, 54).map((g) => ({ ...g, deleted: false, updatedAt: Date.UTC(2024, 0, 1) })) });
     const azul = store.list('games').find((g) => g.name === 'Azul');
     store.save('games', { ...azul, notes: 'Notre règle maison' });
     const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
-    expect(stats.games).toMatchObject({ added: games.length - 54, updated: 0, deleted: 0 });
+    const removedInV1 = games.slice(0, 54).filter((g) => g.deleted).length;
+    expect(stats.games).toMatchObject({ added: active.length - (54 - removedInV1), deleted: removedInV1 });
     expect(store.get('games', azul.id).notes).toBe('Notre règle maison');
   });
 
@@ -77,25 +80,47 @@ describe('catalogue des jeux de la maison', () => {
     expect(names.filter((n) => n === 'uno')).toHaveLength(1);
     const skyjo = store.list('games').find((g) => g.name === 'Skyjo');
     expect(store.list('sessions').filter((s) => s.gameId === skyjo.id)).toHaveLength(1);
-    expect(store.list('games')).toHaveLength(games.length + 2); // + Yams et Pandémie
+    expect(store.list('games')).toHaveLength(active.length + 2); // + Yams et Pandémie
   });
 
   it('chaque jeu du catalogue a une vignette', () => {
-    for (const g of games) expect(g.icon, g.name).toBeTruthy();
+    for (const g of active) expect(g.icon, g.name).toBeTruthy();
   });
 
   it('mise à jour v2 → v3 : les vignettes arrivent, les jeux modifiés sont respectés', async () => {
     const store = await new Store(new MemoryBackend()).init();
     // État d'un téléphone en version 2 : mêmes jeux, sans vignette, plus anciens
-    const old = games.map(({ icon, ...g }) => ({ ...g, updatedAt: Date.UTC(2024, 0, 1) }));
+    const old = active.map(({ icon, ...g }) => ({ ...g, updatedAt: Date.UTC(2024, 0, 1) }));
     store.applyRemote({ games: old });
     const azul = store.list('games').find((g) => g.name === 'Azul');
     store.save('games', { ...azul, notes: 'Modifié sur le téléphone' });
     const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
-    expect(stats.games).toMatchObject({ added: 0, updated: games.length - 1 });
+    expect(stats.games).toMatchObject({ added: 0, updated: active.length - 1 });
     expect(store.list('games').find((g) => g.name === 'Splendor').icon).toBe('💎');
     expect(store.get('games', azul.id).icon).toBeUndefined();
     expect(store.get('games', azul.id).notes).toBe('Modifié sur le téléphone');
+  });
+
+  it('mise à jour v3 → v4 : les jeux retirés disparaissent, sauf s’ils ont été modifiés depuis', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    const v3 = games.map((g) => ({ ...g, deleted: false, updatedAt: Date.UTC(2024, 1, 1) }));
+    store.applyRemote({ games: v3 });
+    const colorino = store.list('games').find((g) => g.name === 'Colorino');
+    const loto = store.list('games').find((g) => g.name === 'Loto des p’tits incollables');
+    store.save('games', { ...loto, notes: 'On le garde !' });
+    const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
+    expect(stats.games.deleted).toBe(games.length - active.length - 1);
+    expect(store.get('games', colorino.id)).toBeNull();
+    expect(store.get('games', loto.id).notes).toBe('On le garde !');
+    expect(store.list('games')).toHaveLength(active.length + 1);
+  });
+
+  it('les jeux retirés ne s’installent pas sur un nouveau téléphone', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    store.applyRemote({ games: catalogToMerge([]) });
+    expect(store.list('games').map((g) => g.name)).not.toContain('Colorino');
+    expect(store.list('games')).toHaveLength(active.length);
+    expect(active).toHaveLength(78);
   });
 });
 
