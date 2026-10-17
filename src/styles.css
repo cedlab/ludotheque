@@ -1751,3 +1751,21 @@ html.picker-open body {
   display: flex;
   flex-direction: column;
 }
+
+/* Styles de jeu */
+.style-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.style-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.chip.style-chip.on {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 16%, var(--surface));
+}

@@ -5,6 +5,7 @@ import { icon } from '../icons.js';
 import { confirmDialog, emptyState, gameLogo, header, sheet, toast } from '../components.js';
 import { describeScoring } from '../../logic/scoring.js';
 import { describeDice, normalizeDice } from '../../logic/dice.js';
+import { GAME_STYLES, gameHasStyle, gameStyles, styleById } from '../../logic/styles.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
@@ -12,7 +13,7 @@ import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { players: null, duration: null, age: null, q: '' };
+const filters = { players: null, duration: null, age: null, style: null, q: '' };
 
 export function gameMatches(g, f = filters) {
   if (f.players != null) {
@@ -22,6 +23,7 @@ export function gameMatches(g, f = filters) {
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
   if (f.age != null && g.minAge && g.minAge > f.age) return false;
   if (f.q && !normalizeName(g.name).includes(normalizeName(f.q))) return false;
+  if (f.style && !gameHasStyle(g, f.style)) return false;
   return true;
 }
 
@@ -55,12 +57,19 @@ function filterBar(onChange) {
     options.map((o) => h('option', { value: String(o), selected: value === o }, fmt(o))));
     return sel;
   };
+  const styleSelect = h('select', {
+    class: `chip-select ${filters.style ? 'on' : ''}`, 'aria-label': 'Style',
+    onchange: () => { filters.style = styleSelect.value || null; onChange(); },
+  },
+  h('option', { value: '' }, 'Style : tous'),
+  GAME_STYLES.map((st) => h('option', { value: st.id, selected: filters.style === st.id }, `${st.emoji} ${st.label}`)));
   return h('div', { class: 'filters' },
     chip('Joueurs', filters.players, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'players', (n) => `👥 ${n} joueur${n > 1 ? 's' : ''}`),
     chip('Durée', filters.duration, [15, 20, 30, 45, 60, 90, 120], 'duration', (n) => `⏱️ ${n} min max`),
     chip('Âge', filters.age, [3, 4, 5, 6, 7, 8, 10, 12, 14], 'age', (n) => `🎂 ${n} ans`),
-    (filters.players != null || filters.duration != null || filters.age != null) &&
-      h('button', { class: 'chip', onclick: () => { filters.players = filters.duration = filters.age = null; onChange(); } }, 'Effacer'));
+    styleSelect,
+    (filters.players != null || filters.duration != null || filters.age != null || filters.style) &&
+      h('button', { class: 'chip', onclick: () => { filters.players = filters.duration = filters.age = filters.style = null; onChange(); } }, 'Effacer'));
 }
 
 function randomPick(list) {
@@ -184,7 +193,11 @@ export function gameDetailView({ id }) {
         g.duration ? fact('clock', `${g.duration} min`) : null,
         g.minAge ? fact('cake', `Dès ${g.minAge} ans`) : null,
         fact('trophy', describeScoring(g.scoring)),
-        normalizeDice(g.dice) && fact('dice', `Dés : ${describeDice(normalizeDice(g.dice))}`))),
+        normalizeDice(g.dice) && fact('dice', `Dés : ${describeDice(normalizeDice(g.dice))}`),
+        gameStyles(g).length > 0 && h('div', { class: 'style-tags' }, gameStyles(g).map((id) => {
+          const st = styleById(id);
+          return h('span', { class: 'style-tag' }, `${st.emoji} ${st.label}`);
+        })))),
     h('div', { class: 'stack pad-x' },
       h('a', { class: 'btn primary big', href: `#/partie/nouvelle?jeu=${id}` }, icon('play'), 'Lancer une partie'),
       normalizeDice(g.dice) && h('a', { class: 'btn big', href: diceHref(g, `/jeu/${id}`) }, icon('dice'), `Lancer les dés (${describeDice(normalizeDice(g.dice))})`)),

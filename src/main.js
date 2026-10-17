@@ -65,7 +65,7 @@ function applyCatalog(store) {
   }
   const { added, updated, deleted } = stats.games;
   const parts = [];
-  if (added > 0) parts.push(`${plural(added, 'jeu de la maison ajouté', 'jeux de la maison ajoutés')}`);
+  if (added > 0) parts.push(`${plural(added, 'jeu ajouté', 'jeux ajoutés')}`);
   if (deleted > 0) parts.push(`${plural(deleted, 'jeu retiré', 'jeux retirés')}`);
   if (!parts.length && updated > 0) parts.push(`${plural(updated, 'jeu mis', 'jeux mis')} à jour`);
   if (parts.length) setTimeout(() => toast(`Ludothèque de la maison : ${parts.join(', ')}.`), 600);

@@ -6,6 +6,7 @@ import { GAME_ICONS, gameLogo, header, sheet, stepper, toast } from '../componen
 import { COUNTDOWN_WIN, MODES, MODE_LABELS, defaultScoring, normalizeScoring } from '../../logic/scoring.js';
 import { cropImage, pickImageFile } from '../image.js';
 import { DICE_FACES, MAX_DICE, normalizeDice } from '../../logic/dice.js';
+import { GAME_STYLES, normalizeStyles } from '../../logic/styles.js';
 
 const MODE_HELP = {
   highest: 'Le total le plus élevé l’emporte (Yams, Scrabble…).',
@@ -106,6 +107,21 @@ export function gameFormView({ id }) {
   renderScoring();
 
   // Dés utilisés par le jeu (facultatif)
+  // Styles de jeu (plusieurs possibles)
+  g.styles = normalizeStyles(g.styles);
+  const stylesBox = h('div', { class: 'chips' });
+  const renderStyles = () => setChildren(stylesBox, GAME_STYLES.map((st) => {
+    const on = g.styles.includes(st.id);
+    return h('button', {
+      type: 'button', class: `chip style-chip ${on ? 'on' : ''}`, 'aria-pressed': String(on),
+      onclick: () => {
+        g.styles = normalizeStyles(on ? g.styles.filter((x) => x !== st.id) : [...g.styles, st.id]);
+        renderStyles();
+      },
+    }, `${st.emoji} ${st.label}`);
+  }));
+  renderStyles();
+
   g.dice = normalizeDice(g.dice);
   const diceBox = h('div', { class: 'stack' });
   const renderDice = () => {
@@ -148,6 +164,7 @@ export function gameFormView({ id }) {
       h('div', { class: 'field-row' }, h('span', null, 'Durée'), durationStep),
       h('div', { class: 'field-row' }, h('span', null, 'Âge minimum'), ageStep)),
     h('section', { class: 'card stack' }, h('h3', null, 'Comptage des points'), scoringBox),
+    h('section', { class: 'card stack' }, h('h3', null, 'Style de jeu'), h('p', { class: 'muted small' }, 'Plusieurs choix possibles.'), stylesBox),
     h('section', { class: 'card stack' }, h('h3', null, 'Dés'), diceBox),
     h('section', { class: 'card stack' }, h('h3', null, 'Notes'), notes),
     h('div', { class: 'sticky-actions' },

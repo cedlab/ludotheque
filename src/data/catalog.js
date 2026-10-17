@@ -7,12 +7,12 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 4;
+export const CATALOG_VERSION = 5;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
 // vignette ; un jeu modifié depuis (date plus récente) garde sa version.
-const REVISED = Date.UTC(2024, 1, 1);
+const REVISED = Date.UTC(2024, 3, 1); // v5 : styles de jeu
 // v4 : jeux retirés de la maison. Ils restent dans la liste (leur position fixe
 // les identifiants des suivants) mais sont publiés comme supprimés, ce qui les
 // retire aussi des téléphones qui les avaient déjà.
@@ -127,6 +127,100 @@ const GAMES = [
   ['The Crew : en quête de la neuvième planète', 2, 5, 20, 10, COOP],
 ];
 
+// Styles de jeu (voir logic/styles.js).
+const STYLES = {
+  'Splendor': ['strategie', 'cartes', 'famille'],
+  'Terraforming Mars': ['strategie'],
+  'Terraforming Mars : le jeu de dés': ['strategie', 'des'],
+  'Chakra': ['strategie', 'famille'],
+  'Kosmopolit': ['ambiance', 'coop'],
+  'Rauha': ['strategie'],
+  'Les Inventeurs': ['strategie'],
+  'Battle Sheep': ['strategie', 'famille', 'enfants'],
+  'Les Aventuriers du Rail : Europe': ['strategie', 'famille'],
+  'Ark Nova': ['strategie', 'cartes'],
+  'Secret Identity': ['ambiance', 'bluff'],
+  'Tranquillité': ['coop', 'cartes', 'reflexion'],
+  'Château Combo': ['cartes', 'strategie'],
+  'Kingdomino': ['famille', 'strategie'],
+  'Fun Facts': ['ambiance', 'coop'],
+  'Azul': ['famille', 'strategie', 'reflexion'],
+  'Kids of London': ['cartes', 'bluff'],
+  'Augustus': ['famille'],
+  'Mysterium': ['coop', 'bluff'],
+  'Wingspan': ['strategie', 'cartes'],
+  'Wingspan Asie': ['strategie', 'cartes'],
+  'Seasons': ['strategie', 'cartes', 'des'],
+  'Mémoire 44': ['strategie', 'des'],
+  'Scrabble Junior': ['mots', 'enfants'],
+  'Fiesta de los Muertos': ['ambiance', 'coop', 'mots'],
+  'Sur les traces de Darwin': ['famille', 'strategie'],
+  'Codenames': ['ambiance', 'mots'],
+  'Mr. Jack': ['bluff', 'strategie'],
+  '7 Wonders Duel': ['strategie', 'cartes'],
+  'Las Vegas': ['des', 'famille'],
+  'Zenith': ['strategie', 'cartes'],
+  'The Manhattan Project': ['strategie'],
+  'Courtisans': ['cartes', 'bluff'],
+  'Sushi Go Party!': ['cartes', 'famille'],
+  'Yokai': ['coop', 'reflexion'],
+  'Faraway': ['cartes', 'strategie'],
+  'Little Town': ['strategie', 'famille'],
+  'Akropolis': ['famille', 'strategie', 'reflexion'],
+  '7 Wonders': ['strategie', 'cartes'],
+  '7 Wonders Architects': ['famille', 'cartes'],
+  'Monkey Palace': ['strategie', 'famille'],
+  'It’s a Wonderful World': ['strategie', 'cartes'],
+  'Turing Machine': ['reflexion', 'bluff'],
+  'Ceci n’est pas une pomme': ['reflexion', 'enfants'],
+  'Osmooz Couples': ['ambiance'],
+  'Osmooz Hot': ['ambiance'],
+  'Mon premier jeu de parcours': ['enfants'],
+  'Comme des petits singes': ['enfants'],
+  'Premier jeu d’association (Nathan)': ['enfants'],
+  'Une cuillère pour Martin': ['enfants', 'coop'],
+  'Loto des p’tits incollables': ['enfants'],
+  'Domino des p’tits incollables': ['enfants'],
+  'Maman et ses petits': ['enfants'],
+  'Colorino': ['enfants'],
+  'Skyjo': ['cartes', 'famille'],
+  'La Guerre des Moutons': ['famille', 'strategie'],
+  'Speedbac': ['rapidite', 'mots', 'ambiance'],
+  'Odin': ['cartes'],
+  'Star Realms': ['cartes', 'strategie'],
+  'Boursicocotte': ['bluff', 'cartes', 'famille'],
+  'Texto!': ['mots', 'rapidite'],
+  'Énigmes ? Monde animal': ['quiz', 'enfants'],
+  'Énigmes ? Corps humain': ['quiz', 'enfants'],
+  'Le Petit Bac': ['mots', 'ambiance'],
+  'Parade': ['cartes'],
+  'Dobble': ['rapidite', 'enfants', 'famille'],
+  'Timeline': ['quiz', 'cartes'],
+  'Speed Runners': ['rapidite', 'cartes'],
+  'Cortex Challenge': ['rapidite', 'reflexion'],
+  'Médiévallons': ['cartes', 'famille'],
+  'Bazar Bizarre 2.0': ['rapidite', 'enfants'],
+  'Codex Naturalis': ['cartes', 'strategie'],
+  'Bandido': ['coop', 'enfants'],
+  'De l’Orc pour les Braves': ['cartes', 'ambiance'],
+  'Taboo XXL': ['ambiance', 'mots'],
+  'Sea Salt & Paper': ['cartes'],
+  'Trio': ['cartes', 'reflexion'],
+  'Taco Loco': ['ambiance'],
+  'That’s Not a Hat': ['ambiance', 'bluff'],
+  'Service Compris !': ['cartes', 'ambiance'],
+  'The Line': ['quiz', 'ambiance'],
+  'Les Bâtisseurs : Moyen-Âge': ['strategie', 'cartes'],
+  'Similo : Animaux sauvages': ['coop', 'bluff'],
+  'Jeu de 32 cartes': ['cartes'],
+  'L’Imposteur': ['ambiance', 'bluff'],
+  'Uno': ['cartes', 'famille'],
+  'One Piece : Deviens le roi des pirates': ['quiz'],
+  'Loup-Garou pour une nuit': ['bluff', 'ambiance'],
+  'Duck & Cover': ['cartes'],
+  'The Crew : en quête de la neuvième planète': ['coop', 'cartes'],
+};
+
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
   'Splendor': '💎', 'Terraforming Mars': '🪐', 'Terraforming Mars : le jeu de dés': '🎲', 'Chakra': '🧘',
@@ -170,6 +264,7 @@ export function catalogGames() {
     scoring: structuredClone(scoring),
     dice: null,
     icon: ICONS[name] || null,
+    styles: STYLES[name] || [],
     notes: '',
     ...structuredClone(extra),
   })).map((g) => (REMOVED.has(g.name) ? { ...g, deleted: true, updatedAt: REMOVED_AT } : g));

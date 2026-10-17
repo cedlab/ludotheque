@@ -10,6 +10,7 @@ C'est une application web installable (PWA) qui fonctionne **hors ligne**.
 - **Scores** : le plus haut gagne, le plus bas gagne, score de départ décompté (501, 20 PV… ; le premier à 0 gagne ou le dernier en vie), score cible, coopératif, par équipes. Saisie manche par manche ou score final, gestion des égalités. Les gros boutons +/- s'utilisent d'une main.
 - **Historique et statistiques** : victoires par joueur, jeux les plus joués, meilleur score par jeu, séries de victoires.
 - **Lanceur de dés** : de 1 à 12 dés (D4, D6, D8, D10, D12, D20, D100). Les dés sont lancés sur un tapis : ils rebondissent, se cognent (avec un petit bruit, désactivable) et ralentissent avant de se poser. On touche un dé pour le garder au lancer suivant. Le total et l'historique s'affichent. Chaque jeu peut avoir son réglage (« Yams : 5 × D6 »).
+- **Style de jeu** (stratégie, ambiance, cartes, dés, coopératif, réflexion, rapidité, bluff & déduction, mots, quiz, enfants…) : plusieurs par jeu, avec un filtre sur l'accueil.
 - **Corbeille** (Plus → Corbeille) : un joueur, un jeu ou une partie supprimé par erreur se restaure, et la restauration se propage aux autres téléphones au prochain partage.
 - **Partage entre téléphones** par fichier, avec une fusion intelligente qui n'écrase jamais rien. Ce fichier sert aussi de sauvegarde.
 
