@@ -35,3 +35,14 @@ export function gameHasStyle(game, styleId) {
   if (!styleId || !IDS.has(styleId)) return true;
   return gameStyles(game).includes(styleId);
 }
+
+/**
+ * Filtre multi-styles. mode 'any' : au moins un des styles ; 'all' : tous.
+ * Aucun style choisi : tout passe.
+ */
+export function gameMatchesStyles(game, styleIds = [], mode = 'any') {
+  const wanted = normalizeStyles(styleIds);
+  if (wanted.length === 0) return true;
+  const own = new Set(gameStyles(game));
+  return mode === 'all' ? wanted.every((id) => own.has(id)) : wanted.some((id) => own.has(id));
+}

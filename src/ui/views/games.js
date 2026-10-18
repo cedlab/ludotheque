@@ -2,10 +2,10 @@
 import { store, navigate } from '../../app.js';
 import { h, plural, secureRandom, vibrate, formatDate, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
-import { confirmDialog, emptyState, gameLogo, header, sheet, toast } from '../components.js';
+import { confirmDialog, emptyState, gameLogo, header, segmented, sheet, toast } from '../components.js';
 import { describeScoring } from '../../logic/scoring.js';
 import { describeDice, normalizeDice } from '../../logic/dice.js';
-import { GAME_STYLES, gameHasStyle, gameStyles, styleById } from '../../logic/styles.js';
+import { GAME_STYLES, gameMatchesStyles, gameStyles, styleById } from '../../logic/styles.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
@@ -13,7 +13,7 @@ import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { players: null, duration: null, age: null, style: null, q: '' };
+const filters = { players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
 
 export function gameMatches(g, f = filters) {
   if (f.players != null) {
@@ -23,7 +23,7 @@ export function gameMatches(g, f = filters) {
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
   if (f.age != null && g.minAge && g.minAge > f.age) return false;
   if (f.q && !normalizeName(g.name).includes(normalizeName(f.q))) return false;
-  if (f.style && !gameHasStyle(g, f.style)) return false;
+  if (!gameMatchesStyles(g, f.styles, f.styleMode)) return false;
   return true;
 }
 
@@ -44,6 +44,37 @@ export function loadSamples() {
   toast(formatImportSummary(stats));
 }
 
+/** Feuille de choix des styles (plusieurs possibles). Le filtre s'applique en direct. */
+function openStylePicker(onChange) {
+  const box = h('div', { class: 'stack' });
+  const draw = () => {
+    const count = sortedGames().filter((g) => gameMatches(g)).length;
+    setChildren(box,
+      h('div', { class: 'chips' }, GAME_STYLES.map((st) => {
+        const on = filters.styles.includes(st.id);
+        return h('button', {
+          type: 'button', class: `chip style-chip ${on ? 'on' : ''}`, 'aria-pressed': String(on),
+          onclick: () => {
+            filters.styles = on ? filters.styles.filter((x) => x !== st.id) : [...filters.styles, st.id];
+            onChange();
+            draw();
+          },
+        }, `${st.emoji} ${st.label}`);
+      })),
+      filters.styles.length > 1 && h('div', { class: 'stack tight' },
+        h('small', { class: 'muted' }, 'Les jeux doivent avoir :'),
+        segmented([
+          { value: 'any', label: 'Au moins un de ces styles' },
+          { value: 'all', label: 'Tous ces styles' },
+        ], filters.styleMode, (m) => { filters.styleMode = m; onChange(); draw(); }, { className: 'wrap' })),
+      h('div', { class: 'row gap' },
+        h('button', { class: 'btn ghost grow', disabled: filters.styles.length === 0, onclick: () => { filters.styles = []; onChange(); draw(); } }, 'Tout décocher'),
+        h('button', { class: 'btn primary grow', onclick: () => s.close() }, `Voir ${plural(count, 'jeu', 'jeux')}`)));
+  };
+  const s = sheet(box, { title: 'Styles de jeu' });
+  draw();
+}
+
 function filterBar(onChange) {
   const chip = (label, value, options, key, fmt) => {
     const sel = h('select', {
@@ -57,19 +88,25 @@ function filterBar(onChange) {
     options.map((o) => h('option', { value: String(o), selected: value === o }, fmt(o))));
     return sel;
   };
-  const styleSelect = h('select', {
-    class: `chip-select ${filters.style ? 'on' : ''}`, 'aria-label': 'Style',
-    onchange: () => { filters.style = styleSelect.value || null; onChange(); },
-  },
-  h('option', { value: '' }, 'Style : tous'),
-  GAME_STYLES.map((st) => h('option', { value: st.id, selected: filters.style === st.id }, `${st.emoji} ${st.label}`)));
+  const n = filters.styles.length;
+  const styleLabel = n === 0 ? 'Style : tous'
+    : n === 1 ? (() => { const st = styleById(filters.styles[0]); return `${st.emoji} ${st.label}`; })()
+      : `🎭 ${n} styles`;
+  const styleSelect = h('button', {
+    class: `chip-select ${n ? 'on' : ''}`, 'aria-label': 'Choisir les styles', 'aria-haspopup': 'dialog',
+    onclick: () => openStylePicker(onChange),
+  }, `${styleLabel} ▾`);
   return h('div', { class: 'filters' },
     chip('Joueurs', filters.players, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'players', (n) => `👥 ${n} joueur${n > 1 ? 's' : ''}`),
     chip('Durée', filters.duration, [15, 20, 30, 45, 60, 90, 120], 'duration', (n) => `⏱️ ${n} min max`),
     chip('Âge', filters.age, [3, 4, 5, 6, 7, 8, 10, 12, 14], 'age', (n) => `🎂 ${n} ans`),
     styleSelect,
-    (filters.players != null || filters.duration != null || filters.age != null || filters.style) &&
-      h('button', { class: 'chip', onclick: () => { filters.players = filters.duration = filters.age = filters.style = null; onChange(); } }, 'Effacer'));
+    (filters.players != null || filters.duration != null || filters.age != null || filters.styles.length > 0) &&
+      h('button', { class: 'chip', onclick: () => {
+        filters.players = filters.duration = filters.age = null;
+        filters.styles = [];
+        onChange();
+      } }, 'Effacer'));
 }
 
 function randomPick(list) {

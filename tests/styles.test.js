@@ -44,3 +44,15 @@ describe('styles de jeu', () => {
     expect(store.get('games', azul.id).duration).toBe(50);
   });
 });
+
+describe('filtre multi-styles', () => {
+  it('au moins un / tous', async () => {
+    const { gameMatchesStyles } = await import('../src/logic/styles.js');
+    const g = { styles: ['cartes', 'famille'], scoring: { mode: 'highest' } };
+    expect(gameMatchesStyles(g, [])).toBe(true);
+    expect(gameMatchesStyles(g, ['cartes', 'ambiance'])).toBe(true);
+    expect(gameMatchesStyles(g, ['cartes', 'ambiance'], 'all')).toBe(false);
+    expect(gameMatchesStyles(g, ['cartes', 'famille'], 'all')).toBe(true);
+    expect(gameMatchesStyles(g, ['ambiance', 'des'])).toBe(false);
+  });
+});
