@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 6;
+export const CATALOG_VERSION = 7;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -145,10 +145,29 @@ const GAMES = [
   ['Perudo', 2, 6, 30, 8, sc('countdown', { startScore: 5, countdownWin: 'lastStanding' }), { dice: { count: 5, faces: 6 }, notes: 'Chacun commence avec 5 dés et en perd un à chaque défi perdu : le dernier qui a encore des dés gagne.' }],
   ['Elixir', 3, 6, 30, 10, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
   ['Camelot', 2, 4, 20, 8, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
+  // Ajouts (version 7)
+  ['Noé', 2, 5, 20, 8, sc('lowest', { rounds: true }), { notes: 'Le moins de points de pénalité l’emporte.' }],
+  ['Wave', 2, 4, 25, 10, COOP],
+  ['Saboteur', 2, 12, 30, 8, HIGH, { notes: 'Jeu de base + extension « Les mineurs contre-attaquent ».' }],
+  ['À toi de deviner !', 2, 6, 15, 6, HIGH],
+  ['Les Loups-Garous de Thiercelieux', 8, 18, 30, 10, HIGH],
+  ['Time’s Up!', 4, 12, 45, 12, sc('highest', { teams: true, rounds: true }), { notes: '3 manches : description libre, un seul mot, mime.' }],
+  ['6 qui prend !', 2, 10, 45, 10, sc('lowest', { rounds: true }), { notes: 'Le moins de têtes de bœuf l’emporte.' }],
+  ['Similo : Mythes', 2, 8, 10, 7, COOP],
+  ['Unanimo', 3, 12, 20, 7, sc('highest', { rounds: true })],
 ];
 
 // Styles de jeu (voir logic/styles.js).
 const STYLES = {
+  'Noé': ['cartes', 'famille'],
+  'Wave': ['coop', 'cartes'],
+  'Saboteur': ['bluff', 'cartes', 'ambiance'],
+  'À toi de deviner !': ['enfants', 'bluff'],
+  'Les Loups-Garous de Thiercelieux': ['bluff', 'ambiance'],
+  'Time’s Up!': ['ambiance', 'mots'],
+  '6 qui prend !': ['cartes', 'famille'],
+  'Similo : Mythes': ['coop', 'bluff'],
+  'Unanimo': ['mots', 'ambiance'],
   'Fyfe': ['strategie', 'reflexion'],
   'Blokus': ['strategie', 'famille', 'reflexion'],
   'Cascadia': ['strategie', 'famille'],
@@ -262,6 +281,15 @@ const STYLES = {
 
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
+  'Noé': '🛶',
+  'Wave': '🏄',
+  'Saboteur': '⛏️',
+  'À toi de deviner !': '❓',
+  'Les Loups-Garous de Thiercelieux': '🌕',
+  'Time’s Up!': '⏰',
+  '6 qui prend !': '🐮',
+  'Similo : Mythes': '🔱',
+  'Unanimo': '💡',
   'Fyfe': '🌿',
   'Blokus': '🟥',
   'Cascadia': '🦌',
