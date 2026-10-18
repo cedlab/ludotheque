@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 7;
+export const CATALOG_VERSION = 8;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -16,12 +16,13 @@ const REVISED = Date.UTC(2024, 3, 1); // v5 : styles de jeu
 // v4 : jeux retirés de la maison. Ils restent dans la liste (leur position fixe
 // les identifiants des suivants) mais sont publiés comme supprimés, ce qui les
 // retire aussi des téléphones qui les avaient déjà.
-const REMOVED_AT = Date.UTC(2024, 2, 1);
+const REMOVED_AT = Date.UTC(2024, 4, 1); // v8 : Osmooz retirés
 const REMOVED = new Set([
   'Mon premier jeu de parcours', 'Comme des petits singes', 'Premier jeu d’association (Nathan)',
   'Une cuillère pour Martin', 'Loto des p’tits incollables', 'Domino des p’tits incollables',
   'Maman et ses petits', 'Colorino', 'Énigmes ? Monde animal', 'Énigmes ? Corps humain',
   'Jeu de 32 cartes', 'One Piece : Deviens le roi des pirates',
+  'Osmooz Couples', 'Osmooz Hot',
 ]);
 
 const sc = (mode, extra = {}) => ({

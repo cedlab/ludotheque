@@ -20,7 +20,7 @@ Aucun compte, aucun serveur : les données restent sur le téléphone (IndexedDB
 
 ## Utilisation
 
-1. **Jeux** : au premier lancement, la ludothèque contient déjà les jeux de la maison (`src/data/catalog.js`, environ 100 jeux avec leur vignette illustrée, tous modifiables ou supprimables). Un champ de recherche et des filtres aident à s'y retrouver. Pour en ajouter un, touchez **+**. Pour le logo, vous pouvez prendre une photo ou choisir une image : elle est recadrée en carré et compressée à 100 Ko maximum. Sans photo, le jeu affiche une vignette (« Choisir une vignette ») ou, à défaut, ses initiales. Pour découvrir l'app, utilisez **Plus → Charger les exemples**.
+1. **Jeux** : au premier lancement, la ludothèque contient déjà les jeux de la maison (`src/data/catalog.js`, une centaine de jeux avec leur vignette illustrée, tous modifiables ou supprimables). Un champ de recherche et des filtres aident à s'y retrouver. Pour en ajouter un, touchez **+**. Pour le logo, vous pouvez prendre une photo ou choisir une image : elle est recadrée en carré et compressée à 100 Ko maximum. Sans photo, le jeu affiche une vignette (« Choisir une vignette ») ou, à défaut, ses initiales. Pour découvrir l'app, utilisez **Plus → Charger les exemples**.
 2. **Joueurs** : créez un profil par personne (prénom, couleur, avatar).
 3. **Parties → Nouvelle partie** : choisissez le jeu, puis les joueurs (et les équipes si besoin). Touchez **C'est parti !**
    - **+ / −** ajoutent ou retirent des points, selon le pas choisi (1, 5, 10, 50). Touchez un nombre pour le saisir au clavier.

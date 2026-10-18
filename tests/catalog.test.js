@@ -120,7 +120,7 @@ describe('catalogue des jeux de la maison', () => {
     store.applyRemote({ games: catalogToMerge([]) });
     expect(store.list('games').map((g) => g.name)).not.toContain('Colorino');
     expect(store.list('games')).toHaveLength(active.length);
-    expect(active).toHaveLength(106);
+    expect(active).toHaveLength(104);
   });
 
   it('mise à jour depuis v5 : seuls les nouveaux jeux arrivent', async () => {
@@ -129,6 +129,16 @@ describe('catalogue des jeux de la maison', () => {
     const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
     expect(stats.games).toMatchObject({ added: games.length - 90, updated: 0, deleted: 0 });
     expect(store.list('games').find((g) => g.name === 'Perudo').dice).toEqual({ count: 5, faces: 6 });
+  });
+
+  it('mise à jour v7 → v8 : les Osmooz sont retirés, rien d’autre ne bouge', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    // téléphone en v7 : Osmooz présents, 12 jeux déjà retirés
+    const v7 = games.map((g) => (g.name.startsWith('Osmooz') ? { ...g, deleted: false, updatedAt: Date.UTC(2024, 3, 1) } : g.deleted ? { ...g, updatedAt: Date.UTC(2024, 2, 1) } : g));
+    store.applyRemote({ games: v7 });
+    const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
+    expect(stats.games).toMatchObject({ added: 0, deleted: 2 });
+    expect(store.list('games').some((g) => g.name.startsWith('Osmooz'))).toBe(false);
   });
 });
 
