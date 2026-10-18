@@ -120,7 +120,15 @@ describe('catalogue des jeux de la maison', () => {
     store.applyRemote({ games: catalogToMerge([]) });
     expect(store.list('games').map((g) => g.name)).not.toContain('Colorino');
     expect(store.list('games')).toHaveLength(active.length);
-    expect(active).toHaveLength(78);
+    expect(active).toHaveLength(97);
+  });
+
+  it('mise à jour v5 → v6 : seuls les 19 nouveaux jeux arrivent', async () => {
+    const store = await new Store(new MemoryBackend()).init();
+    store.applyRemote({ games: games.slice(0, 90) }); // catalogue v5
+    const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) });
+    expect(stats.games).toMatchObject({ added: 19, updated: 0, deleted: 0 });
+    expect(store.list('games').find((g) => g.name === 'Perudo').dice).toEqual({ count: 5, faces: 6 });
   });
 });
 

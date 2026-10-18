@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 5;
+export const CATALOG_VERSION = 6;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -125,10 +125,49 @@ const GAMES = [
   ['Loup-Garou pour une nuit', 3, 10, 10, 9, HIGH],
   ['Duck & Cover', 2, 6, 20, 8, HIGH],
   ['The Crew : en quête de la neuvième planète', 2, 5, 20, 10, COOP],
+  // Ajouts (version 6)
+  ['Fyfe', 2, 4, 30, 10, HIGH],
+  ['Blokus', 2, 4, 30, 7, sc('lowest'), { notes: 'Chaque carré non posé coûte un point : le plus petit total gagne.' }],
+  ['Cascadia', 1, 4, 45, 10, HIGH],
+  ['Codenames Duo', 2, 4, 15, 12, COOP],
+  ['Viticulture : Édition essentielle', 1, 6, 60, 14, HIGH],
+  ['Pick Picknic', 2, 6, 30, 8, HIGH],
+  ['Croâ !', 2, 4, 30, 7, HIGH],
+  ['Dinosaur World', 2, 4, 90, 14, HIGH],
+  ['Forêt Mixte', 2, 5, 60, 10, HIGH],
+  ['Top Ten', 4, 9, 30, 14, COOP],
+  ['Les Caprices du Roi', 2, 5, 20, 8, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
+  ['Chabyrinthe', 2, 4, 20, 7, HIGH],
+  ['Taï Chi Chuan', 2, 6, 20, 9, HIGH],
+  ['Carambouille', 3, 6, 30, 10, HIGH],
+  ['Le Collier de la Reine', 2, 5, 45, 10, HIGH],
+  ['Chat Perché', 2, 4, 30, 7, HIGH],
+  ['Perudo', 2, 6, 30, 8, sc('countdown', { startScore: 5, countdownWin: 'lastStanding' }), { dice: { count: 5, faces: 6 }, notes: 'Chacun commence avec 5 dés et en perd un à chaque défi perdu : le dernier qui a encore des dés gagne.' }],
+  ['Elixir', 3, 6, 30, 10, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
+  ['Camelot', 2, 4, 20, 8, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
 const STYLES = {
+  'Fyfe': ['strategie', 'reflexion'],
+  'Blokus': ['strategie', 'famille', 'reflexion'],
+  'Cascadia': ['strategie', 'famille'],
+  'Codenames Duo': ['coop', 'mots'],
+  'Viticulture : Édition essentielle': ['strategie'],
+  'Pick Picknic': ['famille', 'bluff'],
+  'Croâ !': ['strategie', 'famille'],
+  'Dinosaur World': ['strategie'],
+  'Forêt Mixte': ['cartes', 'strategie'],
+  'Top Ten': ['ambiance', 'coop'],
+  'Les Caprices du Roi': ['cartes'],
+  'Chabyrinthe': ['famille', 'reflexion'],
+  'Taï Chi Chuan': ['mots', 'rapidite'],
+  'Carambouille': ['bluff', 'ambiance'],
+  'Le Collier de la Reine': ['cartes', 'strategie'],
+  'Chat Perché': ['famille'],
+  'Perudo': ['bluff', 'des', 'ambiance'],
+  'Elixir': ['cartes', 'ambiance'],
+  'Camelot': ['cartes'],
   'Splendor': ['strategie', 'cartes', 'famille'],
   'Terraforming Mars': ['strategie'],
   'Terraforming Mars : le jeu de dés': ['strategie', 'des'],
@@ -223,6 +262,25 @@ const STYLES = {
 
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
+  'Fyfe': '🌿',
+  'Blokus': '🟥',
+  'Cascadia': '🦌',
+  'Codenames Duo': '🕶️',
+  'Viticulture : Édition essentielle': '🍇',
+  'Pick Picknic': '🐓',
+  'Croâ !': '🐸',
+  'Dinosaur World': '🦖',
+  'Forêt Mixte': '🌳',
+  'Top Ten': '🔟',
+  'Les Caprices du Roi': '🤴',
+  'Chabyrinthe': '🐈‍⬛',
+  'Taï Chi Chuan': '🐉',
+  'Carambouille': '🫏',
+  'Le Collier de la Reine': '📿',
+  'Chat Perché': '🐱',
+  'Perudo': '🏺',
+  'Elixir': '🧪',
+  'Camelot': '⚜️',
   'Splendor': '💎', 'Terraforming Mars': '🪐', 'Terraforming Mars : le jeu de dés': '🎲', 'Chakra': '🧘',
   'Kosmopolit': '🍜', 'Rauha': '🌲', 'Les Inventeurs': '💡', 'Battle Sheep': '🐑',
   'Les Aventuriers du Rail : Europe': '🚂', 'Ark Nova': '🐘', 'Secret Identity': '🕵️', 'Tranquillité': '🌊',
