@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Chaque famille a son espace, accessible seulement à qui connaît son code
+    // (16 caractères aléatoires). Impossible de lister les familles.
+    match /families/{family}/records/{record} {
+      allow read, write: if request.auth != null && family.size() == 16;
+    }
+  }
+}

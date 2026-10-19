@@ -61,7 +61,27 @@ Une fois installée, l'app s'ouvre en plein écran et fonctionne sans connexion.
 
 ---
 
-## Partager entre téléphones
+## Synchronisation automatique (Firebase)
+
+Une fois activée, la ludothèque se met à jour toute seule sur tous les téléphones de la famille, dès qu'il y a du réseau. Hors ligne, les modifications attendent et partent au retour du réseau, même si l'app a été fermée entre-temps.
+
+- **Premier téléphone** : **Plus → Synchronisation automatique → Créer une ludothèque partagée**.
+- **Autres téléphones** : sur le premier, touchez **Inviter un autre téléphone** et envoyez le lien, puis ouvrez ce lien sur l'autre téléphone et touchez **Rejoindre**. On peut aussi saisir le code famille à la main (**J'ai un code : rejoindre**).
+- Les ludothèques des téléphones sont fusionnées avec les mêmes règles que l'import de fichier : rien n'est écrasé, et la modification la plus récente l'emporte.
+- Le **code famille** (16 caractères) est le seul secret : gardez-le pour la famille.
+
+### Mise en place du serveur (une seule fois, pour le propriétaire du dépôt)
+
+1. Sur https://console.firebase.google.com, créez un projet (gratuit, Google Analytics inutile).
+2. **Build → Firestore Database → Créer une base de données**, en mode production, région `europe-west`.
+3. **Firestore → Règles** : collez le contenu de [`firestore.rules`](firestore.rules), puis **Publier**.
+4. **Build → Authentication → Commencer → Mode de connexion → Anonyme : activer**.
+5. **Authentication → Paramètres → Domaines autorisés** : ajoutez `cedlab.github.io`.
+6. **Paramètres du projet → Vos applications → Web (`</>`)** : enregistrez une application, puis copiez l'objet `firebaseConfig` dans [`src/sync/config.js`](src/sync/config.js). Ces valeurs ne sont pas secrètes : l'accès est protégé par les règles et le code famille.
+
+Le code Firebase n'est chargé que si la synchronisation est activée. L'offre gratuite de Firebase couvre très largement l'usage d'une famille.
+
+## Partager entre téléphones (par fichier)
 
 1. Sur le téléphone A : **Plus → Partager ma ludothèque**. Le menu de partage du téléphone s'ouvre : envoyez le fichier par WhatsApp, Messages, mail… Si le partage n'est pas disponible, le fichier `ludotheque-AAAA-MM-JJ.json` est téléchargé.
 2. Sur le téléphone B : enregistrez le fichier reçu (dans « Fichiers » sur iPhone), puis **Plus → Importer un fichier reçu** et choisissez-le.

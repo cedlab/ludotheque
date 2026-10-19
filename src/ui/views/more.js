@@ -7,6 +7,7 @@ import { exportFileName } from '../../data/exchange.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { loadSamples } from './games.js';
 import { deletedCount } from './trash.js';
+import { syncCard } from './sync.js';
 import { canPromptInstall, checkForUpdate, isIOS, isStandalone, onInstallAvailable, promptInstall } from '../../pwa.js';
 import { applyTheme, getTheme } from '../../theme.js';
 
@@ -87,6 +88,7 @@ function installHelp() {
 }
 
 export function moreView() {
+  const sync = syncCard();
   const s = store.snapshot({ includeDeleted: false });
   const installBox = h('div');
   const drawInstall = () => {
@@ -104,8 +106,9 @@ export function moreView() {
 
   const el = h('div', null,
     header('Plus'),
+    sync.el,
     h('section', { class: 'card stack' },
-      h('h3', null, '📲 Partage entre téléphones'),
+      h('h3', null, '📲 Partage par fichier'),
       h('p', { class: 'muted' }, 'Envoyez votre ludothèque (jeux, logos, joueurs, parties) à un proche. De son côté, il l’importe : les données sont fusionnées, rien n’est écrasé.'),
       h('button', { class: 'btn primary big', onclick: shareLibrary }, icon('share'), 'Partager ma ludothèque'),
       h('button', { class: 'btn big', onclick: importLibrary }, icon('download'), 'Importer un fichier reçu'),
@@ -141,5 +144,5 @@ export function moreView() {
         toast('Données effacées.');
         refresh();
       } }, icon('trash'), 'Effacer les données de cet appareil')));
-  return { el, cleanup: off };
+  return { el, cleanup: () => { off(); sync.cleanup(); } };
 }
