@@ -132,7 +132,7 @@ export function moreView() {
       h('button', { class: 'btn', onclick: loadSamples }, 'Charger les exemples')),
     h('section', { class: 'card stack' },
       h('h3', null, 'ℹ️ À propos'),
-      h('p', { class: 'muted small' }, `Ludothèque v${__APP_VERSION__}. Vos données restent sur cet appareil (aucun serveur, aucun compte).`),
+      h('p', { class: 'muted small' }, `Ludothèque v${__APP_VERSION__}. Vos données restent sur cet appareil, sauf si vous activez la synchronisation (aucun compte, seul le code de votre ludothèque y donne accès).`),
       h('button', { class: 'btn ghost', onclick: async () => {
         toast((await checkForUpdate()) ? 'Mise à jour en cours de téléchargement…' : 'Vous avez la dernière version.');
       } }, 'Rechercher une mise à jour'),
