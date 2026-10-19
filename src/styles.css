@@ -1774,3 +1774,8 @@ html.picker-open body {
   white-space: normal;
   line-height: 1.15;
 }
+.icon-btn.flat {
+  box-shadow: none;
+  background: transparent;
+  color: var(--danger);
+}

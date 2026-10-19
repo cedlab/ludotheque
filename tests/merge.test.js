@@ -225,5 +225,24 @@ describe('Store (fusion + persistance)', () => {
     expect(formatImportSummary(other.importText(JSON.stringify(me.exportData())))).toBe('1 joueur mis à jour');
     expect(other.get('players', maxou.id).name).toBe('Maxou');
   });
+
+  it('vider la corbeille : l’élément ne revient pas à l’import, et la suppression se propage', async () => {
+    const a = await new Store(new MemoryBackend()).init();
+    const p = a.save('players', { name: 'Test', color: '#000' });
+    const file = JSON.stringify(a.exportData());
+    await new Promise((r) => setTimeout(r, 2));
+    a.remove('players', p.id);
+    expect(a.purge('players', [p.id])).toBe(1);
+    const t = a.get('players', p.id, { includeDeleted: true });
+    expect(t).toMatchObject({ deleted: true, purged: true });
+    expect(t.name).toBeUndefined();
+    expect(formatImportSummary(a.importText(file))).toMatch(/Rien de nouveau/); // pas de message « Corbeille »
+    expect(a.get('players', p.id)).toBeNull();
+    // un autre téléphone qui avait le joueur le perd au prochain partage
+    const b = await new Store(new MemoryBackend()).init();
+    b.importText(file);
+    expect(formatImportSummary(b.importText(JSON.stringify(a.exportData())))).toBe('1 joueur supprimé');
+    expect(a.purge('players', [p.id])).toBe(0);
+  });
 });
 

@@ -13,7 +13,7 @@
 //     que l'import de fichier (dernière modification gagnante, suppressions
 //     logiques), sans jamais rien écraser de plus récent.
 import { COLLECTIONS, mergeDatasets } from './merge.js';
-import { createRecord, touchRecord, tombstone } from './records.js';
+import { createRecord, nextTimestamp, touchRecord, tombstone } from './records.js';
 import { buildExport, parseImport } from './exchange.js';
 
 export class Store {
@@ -73,6 +73,22 @@ export class Store {
     const rec = touchRecord(prev, { deleted: false });
     this.#write(col, [rec], 'local');
     return rec;
+  }
+
+  /**
+   * Suppression définitive (« vider la corbeille ») : on ne garde qu'une trace
+   * minimale (id, date, supprimé) pour que la suppression continue de se
+   * propager et que l'élément ne revienne pas lors d'un import.
+   */
+  purge(col, ids) {
+    const recs = [];
+    for (const id of ids) {
+      const prev = this.data[col].get(id);
+      if (!prev || !prev.deleted || prev.purged) continue;
+      recs.push({ id, createdAt: prev.createdAt, updatedAt: nextTimestamp(prev.updatedAt), deleted: true, purged: true });
+    }
+    if (recs.length) this.#write(col, recs, 'local');
+    return recs.length;
   }
 
   #write(col, records, source) {

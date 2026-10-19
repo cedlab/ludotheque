@@ -64,7 +64,7 @@ export function mergeCollection(localList = [], incomingList = []) {
     const winner = pickWinner(current, incoming);
     if (winner === current) {
       // Supprimé ici plus récemment que la version reçue : la suppression l'emporte.
-      if (current?.deleted && !incoming.deleted && current === local.get(incoming.id)) keptDeleted.add(incoming.id);
+      if (current?.deleted && !current.purged && !incoming.deleted && current === local.get(incoming.id)) keptDeleted.add(incoming.id);
       continue;
     }
     if (current && stableStringify(current) === stableStringify(incoming)) continue;
