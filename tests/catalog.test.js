@@ -120,7 +120,7 @@ describe('catalogue des jeux de la maison', () => {
     store.applyRemote({ games: catalogToMerge([]) });
     expect(store.list('games').map((g) => g.name)).not.toContain('Colorino');
     expect(store.list('games')).toHaveLength(active.length);
-    expect(active).toHaveLength(104);
+    expect(active).toHaveLength(105);
   });
 
   it('mise à jour depuis v5 : seuls les nouveaux jeux arrivent', async () => {

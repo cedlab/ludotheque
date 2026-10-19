@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 8;
+export const CATALOG_VERSION = 9;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -156,10 +156,13 @@ const GAMES = [
   ['6 qui prend !', 2, 10, 45, 10, sc('lowest', { rounds: true }), { notes: 'Le moins de têtes de bœuf l’emporte.' }],
   ['Similo : Mythes', 2, 8, 10, 7, COOP],
   ['Unanimo', 3, 12, 20, 7, sc('highest', { rounds: true })],
+  // Ajouts (version 9)
+  ['Rubik’s Race', 2, 2, 10, 7, HIGH, { notes: 'Le premier à reproduire le motif tiré gagne la manche.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
 const STYLES = {
+  'Rubik’s Race': ['rapidite', 'reflexion', 'famille'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -282,6 +285,7 @@ const STYLES = {
 
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
+  'Rubik’s Race': '🟨',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
