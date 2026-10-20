@@ -378,10 +378,17 @@ export function normalizeName(name = '') {
 export function catalogToMerge(existingGames = []) {
   const ownIds = new Set(existingGames.map((g) => g.id));
   const names = new Set(existingGames.filter((g) => !g.deleted).map((g) => normalizeName(g.name)));
-  const favorites = new Set(existingGames.filter((g) => g.favorite).map((g) => g.id));
+  // Ce que la famille a choisi (favori, liste) ne doit pas être perdu à une mise à jour du catalogue.
+  const personal = new Map(existingGames.map((g) => [g.id, { favorite: g.favorite, status: g.status }]));
   // Les jeux retirés (supprimés) passent toujours : leur suppression doit se propager.
   return catalogGames()
     .filter((g) => g.deleted || ownIds.has(g.id) || !names.has(normalizeName(g.name)))
-    // Une mise à jour du catalogue ne doit pas faire perdre un favori.
-    .map((g) => (favorites.has(g.id) && !g.deleted ? { ...g, favorite: true } : g));
+    .map((g) => {
+      const mine = personal.get(g.id);
+      if (!mine || g.deleted) return g;
+      const out = { ...g };
+      if (mine.favorite) out.favorite = true;
+      if (mine.status) out.status = mine.status;
+      return out;
+    });
 }

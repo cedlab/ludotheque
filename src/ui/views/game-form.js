@@ -2,7 +2,8 @@
 import { store, navigate, back } from '../../app.js';
 import { h, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
-import { GAME_ICONS, gameLogo, header, sheet, stepper, toast } from '../components.js';
+import { GAME_ICONS, gameLogo, header, segmented, sheet, stepper, toast } from '../components.js';
+import { GAME_LISTS, gameList, listById, normalizeList } from '../../logic/collection.js';
 import { COUNTDOWN_WIN, MODES, MODE_LABELS, defaultScoring, normalizeScoring } from '../../logic/scoring.js';
 import { cropImage, pickImageFile } from '../image.js';
 import { DICE_FACES, MAX_DICE, normalizeDice } from '../../logic/dice.js';
@@ -17,7 +18,7 @@ const MODE_HELP = {
 };
 const MODE_EMOJI = { highest: '⬆️', lowest: '⬇️', countdown: '⏬', target: '🎯', coop: '🤝' };
 
-export function gameFormView({ id }) {
+export function gameFormView({ id }, query = {}) {
   const existing = id ? store.get('games', id) : null;
   if (id && !existing) {
     navigate('/', { replace: true });
@@ -28,6 +29,17 @@ export function gameFormView({ id }) {
     ...structuredClone(existing || {}),
   };
   g.scoring = normalizeScoring(g.scoring || defaultScoring());
+  g.status = existing ? gameList(existing) : normalizeList(query.liste);
+  const listHelp = h('p', { class: 'muted small' });
+  const LIST_HELP = {
+    owned: 'Le jeu est à la maison : il est proposé par « À quoi joue-t-on ? ».',
+    tested: 'Essayé ailleurs (association, amis…), pas à la maison.',
+    wishlist: 'Un jeu qui vous fait envie, à acheter ou à demander en cadeau.',
+  };
+  const setList = (v) => { g.status = v; listHelp.textContent = LIST_HELP[v]; };
+  setList(g.status);
+  const listPicker = segmented(GAME_LISTS.map((l) => ({ value: l.id, label: `${l.emoji} ${l.one}` })),
+    g.status, setList, { className: 'wrap' });
 
   const logoBox = h('div', { class: 'logo-edit' });
   const nameInput = h('input', {
@@ -150,13 +162,16 @@ export function gameFormView({ id }) {
       return;
     }
     const rec = store.save('games', { ...g, scoring: normalizeScoring(g.scoring) });
-    toast(existing ? 'Jeu modifié.' : `« ${rec.name} » ajouté à la ludothèque !`);
+    toast(existing ? 'Jeu modifié.'
+      : rec.status === 'owned' ? `« ${rec.name} » ajouté à la ludothèque !`
+        : `« ${rec.name} » ${listById(rec.status).added}.`);
     navigate(`/jeu/${rec.id}`, { replace: true });
   };
 
   return h('form', { class: 'form', onsubmit: save },
     header(existing ? 'Modifier le jeu' : 'Nouveau jeu', { back: existing ? `#/jeu/${existing.id}` : '#/' }),
     h('section', { class: 'card stack' }, nameInput, logoBox),
+    h('section', { class: 'card stack' }, h('h3', null, 'Ce jeu est…'), listPicker, listHelp),
     h('section', { class: 'card stack' },
       h('h3', null, 'Infos'),
       h('div', { class: 'field-row' }, h('span', null, 'Joueurs min.'), minStep),

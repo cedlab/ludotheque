@@ -4,6 +4,7 @@ import { normalizeScoring } from '../src/logic/scoring.js';
 import { normalizeDice } from '../src/logic/dice.js';
 import { Store } from '../src/data/store.js';
 import { MemoryBackend } from '../src/data/backends.js';
+import { gameList, listById, normalizeList } from '../src/logic/collection.js';
 import { sampleData } from '../src/data/sample.js';
 
 describe('catalogue des jeux de la maison', () => {
@@ -32,10 +33,12 @@ describe('catalogue des jeux de la maison', () => {
     expect(normalizeName('Les Aventuriers du Rail : Europe')).toBe('les aventuriers du rail europe');
   });
 
-  it('une mise à jour du catalogue garde les favoris', () => {
+  it('une mise à jour du catalogue garde les favoris et la liste choisie', () => {
     const g = active[0];
-    const mine = { ...g, favorite: true, updatedAt: g.updatedAt - 1000 };
-    expect(catalogToMerge([mine]).find((x) => x.id === g.id).favorite).toBe(true);
+    const mine = { ...g, favorite: true, status: 'wishlist', updatedAt: g.updatedAt - 1000 };
+    const merged = catalogToMerge([mine]).find((x) => x.id === g.id);
+    expect(merged.favorite).toBe(true);
+    expect(merged.status).toBe('wishlist');
     expect(catalogToMerge([]).find((x) => x.id === g.id).favorite).toBeUndefined();
   });
 
@@ -149,3 +152,14 @@ describe('catalogue des jeux de la maison', () => {
   });
 });
 
+
+describe('listes de jeux', () => {
+  it('à la maison par défaut, testé ou à acquérir sinon', () => {
+    expect(gameList({})).toBe('owned');
+    expect(gameList({ status: 'bidon' })).toBe('owned');
+    expect(gameList({ status: 'tested' })).toBe('tested');
+    expect(gameList({ status: 'wishlist' })).toBe('wishlist');
+    expect(normalizeList(undefined)).toBe('owned');
+    expect(listById('wishlist').label).toBe('À acquérir');
+  });
+});

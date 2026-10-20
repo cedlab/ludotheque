@@ -1,5 +1,5 @@
 // Collection de jeux : liste, filtres, tirage « À quoi joue-t-on ? », fiche.
-import { store, navigate } from '../../app.js';
+import { store, navigate, refresh } from '../../app.js';
 import { h, plural, secureRandom, vibrate, formatDate, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
 import { confirmDialog, emptyState, gameLogo, header, segmented, sheet, toast } from '../components.js';
@@ -7,13 +7,14 @@ import { describeScoring } from '../../logic/scoring.js';
 import { describeDice, normalizeDice } from '../../logic/dice.js';
 import { GAME_STYLES, gameMatchesStyles, gameStyles, styleById } from '../../logic/styles.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
+import { GAME_LISTS, gameList, listById } from '../../logic/collection.js';
 import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { favorites: false, players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
+const filters = { list: 'owned', favorites: false, players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
 
 export function gameMatches(g, f = filters) {
   if (f.favorites && !g.favorite) return false;
@@ -38,7 +39,24 @@ export function gameMeta(g) {
   return parts.join(' · ');
 }
 
-export const sortedGames = () => store.list('games').sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+const LIST_ORDER = Object.fromEntries(GAME_LISTS.map((l, i) => [l.id, i]));
+
+/** Jeux par ordre alphabétique, ceux de la maison d'abord. */
+export const sortedGames = () => store.list('games').sort((a, b) =>
+  LIST_ORDER[gameList(a)] - LIST_ORDER[gameList(b)] || a.name.localeCompare(b.name, 'fr'));
+
+/** Change un jeu de liste (testé → à acquérir → à la maison). */
+export function moveGame(id, status) {
+  const g = store.get('games', id);
+  if (!g || gameList(g) === status) return;
+  store.save('games', { ...g, status });
+  toast(status === 'owned' ? `« ${g.name} » rejoint votre ludothèque 🎉` : `« ${g.name} » ${listById(status).added}.`);
+}
+
+const LIST_EMPTY = {
+  tested: ['🧪', 'Aucun jeu testé', 'Notez ici les jeux essayés à l’association ou chez des amis, pour vous en souvenir.'],
+  wishlist: ['🛒', 'Rien à acquérir pour l’instant', 'Ajoutez les jeux qui vous font envie : pratique pour une idée de cadeau.'],
+};
 
 /** Ajoute ou retire un jeu des favoris (partagé avec la synchronisation, comme le reste de la fiche). */
 export function toggleFavorite(id) {
@@ -189,11 +207,12 @@ export function gamesView() {
     'aria-label': 'Rechercher un jeu', autocomplete: 'off', enterkeyhint: 'search',
     oninput: () => { filters.q = search.value; drawResults(); },
   });
-  const filtered = () => sortedGames().filter((g) => gameMatches(g));
+  const inList = () => sortedGames().filter((g) => gameList(g) === filters.list);
+  const filtered = () => inList().filter((g) => gameMatches(g));
 
   // Seule la liste est redessinée pendant la frappe : le champ garde le focus.
   const drawResults = () => {
-    const all = sortedGames();
+    const all = inList();
     const list = filtered();
     heroSub.textContent = list.length === all.length
       ? `Tirage parmi vos ${plural(all.length, 'jeu', 'jeux')}`
@@ -213,18 +232,33 @@ export function gamesView() {
   };
 
   const draw = () => {
-    const all = sortedGames();
+    const everything = sortedGames();
+    const all = inList();
+    const owned = filters.list === 'owned';
+    const addHref = owned ? '#/jeu/nouveau' : `#/jeu/nouveau?liste=${filters.list}`;
+    const counts = Object.fromEntries(GAME_LISTS.map((l) => [l.id, everything.filter((g) => gameList(g) === l.id).length]));
+    // Les onglets n'apparaissent qu'une fois la ludothèque commencée.
+    const tabs = everything.length > 0 && h('div', { class: 'pad-x list-tabs' },
+      segmented(GAME_LISTS.map((l) => ({
+        value: l.id,
+        label: [h('span', null, l.tab), h('small', { class: 'tab-count' }, String(counts[l.id]))],
+      })), filters.list, (v) => { filters.list = v; draw(); }));
     setChildren(wrap,
-      header('Ludothèque', {
+      header(owned ? 'Ludothèque' : listById(filters.list).label, {
         lead: h('a', { class: 'icon-btn', href: '#/des', 'aria-label': 'Lancer des dés' }, icon('dice')),
-        actions: [h('a', { class: 'icon-btn', href: '#/jeu/nouveau', 'aria-label': 'Ajouter un jeu' }, icon('plus'))],
+        actions: [h('a', { class: 'icon-btn', href: addHref, 'aria-label': 'Ajouter un jeu' }, icon('plus'))],
       }),
-      all.length === 0
+      tabs,
+      !owned && all.length === 0
+        ? emptyState(...LIST_EMPTY[filters.list],
+            h('a', { class: 'btn primary big', href: addHref }, icon('plus'), 'Ajouter un jeu'),
+            h('p', { class: 'muted small' }, 'Astuce : depuis la fiche d’un jeu testé, un bouton le passe en « À acquérir », puis dans la ludothèque une fois acheté.'))
+      : all.length === 0
         ? emptyState('🎲', 'Votre ludothèque est vide', 'Ajoutez vos jeux de société, ou découvrez l’app avec quelques exemples.',
             h('a', { class: 'btn primary big', href: '#/jeu/nouveau' }, icon('plus'), 'Ajouter un jeu'),
             h('button', { class: 'btn ghost', onclick: loadSamples }, 'Charger les exemples'))
         : [
-            h('button', { class: 'btn hero', onclick: () => randomPick(filtered()) },
+            owned && h('button', { class: 'btn hero', onclick: () => randomPick(filtered()) },
               h('span', { class: 'hero-emoji' }, '🎲'),
               h('span', null, h('strong', null, 'À quoi joue-t-on ?'), heroSub)),
             all.length > 8 && h('div', { class: 'pad-x' }, search),
@@ -276,6 +310,7 @@ export function gameDetailView({ id }) {
           const st = styleById(id);
           return h('span', { class: 'style-tag' }, `${st.emoji} ${st.label}`);
         })))),
+    gameList(g) !== 'owned' && listCard(g),
     h('div', { class: 'stack pad-x' },
       h('a', { class: 'btn primary big', href: `#/partie/nouvelle?jeu=${id}` }, icon('play'), 'Lancer une partie'),
       normalizeDice(g.dice) && h('a', { class: 'btn big', href: diceHref(g, `/jeu/${id}`) }, icon('dice'), `Lancer les dés (${describeDice(normalizeDice(g.dice))})`)),
@@ -291,6 +326,16 @@ export function gameDetailView({ id }) {
           ]),
     h('div', { class: 'pad' }, h('button', { class: 'btn danger-ghost', onclick: remove }, icon('trash'), 'Supprimer ce jeu')),
     h('p', { class: 'muted small center-text' }, `Ajouté le ${formatDate(g.createdAt)}`));
+}
+
+/** Fiche d'un jeu testé ou à acquérir : où il en est, et de quoi le faire avancer. */
+function listCard(g) {
+  const l = listById(gameList(g));
+  const go = (status) => { moveGame(g.id, status); refresh(); };
+  return h('section', { class: 'card stack list-card' },
+    h('p', { class: 'list-badge' }, `${l.emoji} ${gameList(g) === 'tested' ? 'Testé, pas encore à la maison' : 'Sur la liste « À acquérir »'}`),
+    h('button', { class: 'btn primary', onclick: () => go('owned') }, '🏠 Je l’ai, il est à la maison'),
+    gameList(g) === 'tested' && h('button', { class: 'btn', onclick: () => go('wishlist') }, '🛒 Ajouter à « À acquérir »'));
 }
 
 function fact(ic, text) {

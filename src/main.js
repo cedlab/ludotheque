@@ -20,7 +20,7 @@ initTheme();
 registerServiceWorker();
 
 route('/', gamesView, { tab: 'games' });
-route('/jeu/nouveau', () => gameFormView({}), { tab: 'games' });
+route('/jeu/nouveau', (_, query) => gameFormView({}, query), { tab: 'games' });
 route('/jeu/:id/modifier', gameFormView, { tab: 'games' });
 route('/jeu/:id', gameDetailView, { tab: 'games' });
 route('/parties', sessionsView, { tab: 'sessions' });
