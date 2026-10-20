@@ -13,9 +13,10 @@ import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
+const filters = { favorites: false, players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
 
 export function gameMatches(g, f = filters) {
+  if (f.favorites && !g.favorite) return false;
   if (f.players != null) {
     if (g.minPlayers && f.players < g.minPlayers) return false;
     if (g.maxPlayers && f.players > g.maxPlayers) return false;
@@ -38,6 +39,34 @@ export function gameMeta(g) {
 }
 
 export const sortedGames = () => store.list('games').sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+
+/** Ajoute ou retire un jeu des favoris (partagé avec la synchronisation, comme le reste de la fiche). */
+export function toggleFavorite(id) {
+  const g = store.get('games', id);
+  if (!g) return false;
+  const saved = store.save('games', { ...g, favorite: !g.favorite });
+  vibrate(15);
+  return saved.favorite;
+}
+
+/** Bouton cœur : `onToggle` est appelé après le changement. */
+function favoriteButton(g, { onToggle, className = '' } = {}) {
+  const btn = h('button', {
+    type: 'button', class: `fav-btn ${className} ${g.favorite ? 'on' : ''}`,
+    'aria-label': g.favorite ? `Retirer « ${g.name} » des favoris` : `Ajouter « ${g.name} » aux favoris`,
+    'aria-pressed': String(!!g.favorite),
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const on = toggleFavorite(g.id);
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.setAttribute('aria-label', on ? `Retirer « ${g.name} » des favoris` : `Ajouter « ${g.name} » aux favoris`);
+      onToggle?.(on);
+    },
+  }, icon('heart', 22));
+  return btn;
+}
 
 export function loadSamples() {
   const stats = store.applyRemote(samplesFor(store.list('games'), normalizeName));
@@ -97,13 +126,18 @@ function filterBar(onChange) {
     onclick: () => openStylePicker(onChange),
   }, `${styleLabel} ▾`);
   return h('div', { class: 'filters' },
+    h('button', {
+      type: 'button', class: `chip-select fav-chip ${filters.favorites ? 'on' : ''}`, 'aria-pressed': String(filters.favorites),
+      onclick: () => { filters.favorites = !filters.favorites; onChange(); },
+    }, icon('heart', 16), 'Favoris'),
     chip('Joueurs', filters.players, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'players', (n) => `👥 ${n} joueur${n > 1 ? 's' : ''}`),
     chip('Durée', filters.duration, [15, 20, 30, 45, 60, 90, 120], 'duration', (n) => `⏱️ ${n} min max`),
     chip('Âge', filters.age, [3, 4, 5, 6, 7, 8, 10, 12, 14], 'age', (n) => `🎂 ${n} ans`),
     styleSelect,
-    (filters.players != null || filters.duration != null || filters.age != null || filters.styles.length > 0) &&
+    (filters.favorites || filters.players != null || filters.duration != null || filters.age != null || filters.styles.length > 0) &&
       h('button', { class: 'chip', onclick: () => {
         filters.players = filters.duration = filters.age = null;
+        filters.favorites = false;
         filters.styles = [];
         onChange();
       } }, 'Effacer'));
@@ -165,13 +199,17 @@ export function gamesView() {
       ? `Tirage parmi vos ${plural(all.length, 'jeu', 'jeux')}`
       : `Tirage parmi ${plural(list.length, 'jeu filtré', 'jeux filtrés')}`;
     setChildren(results, list.length === 0
-      ? h('p', { class: 'muted center-text pad' }, 'Aucun jeu ne correspond.')
+      ? h('p', { class: 'muted center-text pad' }, filters.favorites && !all.some((g) => g.favorite)
+        ? 'Aucun favori pour l’instant : touchez le cœur d’un jeu pour l’ajouter.'
+        : 'Aucun jeu ne correspond.')
       : h('ul', { class: 'game-grid' },
-          list.map((g) => h('li', null,
+          list.map((g) => h('li', { class: 'game-cell' },
             h('a', { class: 'game-card', href: `#/jeu/${g.id}` },
               gameLogo(g, 72),
               h('span', { class: 'game-name' }, g.name),
-              h('span', { class: 'game-meta' }, gameMeta(g)))))));
+              h('span', { class: 'game-meta' }, gameMeta(g))),
+            // Avec le filtre « Favoris », un jeu retiré disparaît de la liste.
+            favoriteButton(g, { onToggle: () => { if (filters.favorites) drawResults(); } })))));
   };
 
   const draw = () => {
@@ -221,7 +259,10 @@ export function gameDetailView({ id }) {
   return h('div', null,
     header(g.name, {
       back: '#/',
-      actions: [h('a', { class: 'icon-btn', href: `#/jeu/${id}/modifier`, 'aria-label': 'Modifier' }, icon('edit'))],
+      actions: [
+        favoriteButton(g, { className: 'icon-btn' }),
+        h('a', { class: 'icon-btn', href: `#/jeu/${id}/modifier`, 'aria-label': 'Modifier' }, icon('edit')),
+      ],
     }),
     h('section', { class: 'card game-hero' },
       gameLogo(g, 112),

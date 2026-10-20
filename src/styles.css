@@ -219,6 +219,7 @@ p {
   min-width: 44px;
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
 }
 
 .icon-btn {
@@ -769,6 +770,51 @@ textarea.input {
 }
 .game-card:active {
   transform: scale(0.97);
+}
+/* Favoris : cœur dans le coin de la carte */
+.game-cell {
+  position: relative;
+}
+.fav-btn {
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.game-cell .fav-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 44px;
+  height: 44px;
+  opacity: 0.55;
+}
+.fav-btn.icon-btn {
+  background: var(--surface);
+}
+.fav-btn.on {
+  color: var(--danger);
+  opacity: 1;
+}
+.fav-btn.on .icon {
+  fill: currentColor;
+}
+.fav-btn:active .icon {
+  transform: scale(1.25);
+}
+.fav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+}
+.fav-chip.on .icon {
+  color: var(--danger);
+  fill: currentColor;
 }
 .game-name {
   font-weight: 800;

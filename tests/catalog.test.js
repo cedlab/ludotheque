@@ -32,6 +32,13 @@ describe('catalogue des jeux de la maison', () => {
     expect(normalizeName('Les Aventuriers du Rail : Europe')).toBe('les aventuriers du rail europe');
   });
 
+  it('une mise à jour du catalogue garde les favoris', () => {
+    const g = active[0];
+    const mine = { ...g, favorite: true, updatedAt: g.updatedAt - 1000 };
+    expect(catalogToMerge([mine]).find((x) => x.id === g.id).favorite).toBe(true);
+    expect(catalogToMerge([]).find((x) => x.id === g.id).favorite).toBeUndefined();
+  });
+
   it('ne double pas un jeu déjà saisi à la main', () => {
     const own = { id: 'perso', name: 'azul', updatedAt: 5, deleted: false };
     const list = catalogToMerge([own]);
