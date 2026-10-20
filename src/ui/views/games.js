@@ -8,13 +8,14 @@ import { describeDice, normalizeDice } from '../../logic/dice.js';
 import { GAME_STYLES, gameMatchesStyles, gameStyles, styleById } from '../../logic/styles.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { GAME_LISTS, gameList, listById } from '../../logic/collection.js';
+import { ageLabel, ageOptions, gameMatchesAges } from '../../logic/ages.js';
 import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
 import { formatImportSummary } from '../../data/merge.js';
 import { sessionRow } from './sessions.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { list: 'owned', favorites: false, players: null, duration: null, age: null, styles: [], styleMode: 'any', q: '' };
+const filters = { list: 'owned', favorites: false, players: null, duration: null, ages: [], styles: [], styleMode: 'any', q: '' };
 
 export function gameMatches(g, f = filters) {
   if (f.favorites && !g.favorite) return false;
@@ -23,7 +24,7 @@ export function gameMatches(g, f = filters) {
     if (g.maxPlayers && f.players > g.maxPlayers) return false;
   }
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
-  if (f.age != null && g.minAge && g.minAge > f.age) return false;
+  if (!gameMatchesAges(g, f.ages)) return false;
   if (f.q && !normalizeName(g.name).includes(normalizeName(f.q))) return false;
   if (!gameMatchesStyles(g, f.styles, f.styleMode)) return false;
   return true;
@@ -91,11 +92,40 @@ export function loadSamples() {
   toast(formatImportSummary(stats));
 }
 
+/** Nombre de jeux affichés avec les filtres actuels (dans l'onglet ouvert). */
+const visibleCount = () => sortedGames().filter((g) => gameList(g) === filters.list && gameMatches(g)).length;
+
+/** Feuille de choix des âges (plusieurs possibles). Le filtre s'applique en direct. */
+function openAgePicker(onChange) {
+  const box = h('div', { class: 'stack' });
+  const options = ageOptions(sortedGames().filter((g) => gameList(g) === filters.list));
+  const draw = () => {
+    setChildren(box,
+      h('p', { class: 'muted small' }, 'Cochez un ou plusieurs âges : les jeux conseillés à partir de ces âges sont affichés.'),
+      h('div', { class: 'chips' }, options.map((age) => {
+        const on = filters.ages.includes(age);
+        return h('button', {
+          type: 'button', class: `chip style-chip ${on ? 'on' : ''}`, 'aria-pressed': String(on),
+          onclick: () => {
+            filters.ages = on ? filters.ages.filter((x) => x !== age) : [...filters.ages, age].sort((a, b) => a - b);
+            onChange();
+            draw();
+          },
+        }, `🎂 ${ageLabel(age)}`);
+      })),
+      h('div', { class: 'row gap' },
+        h('button', { class: 'btn ghost grow', disabled: filters.ages.length === 0, onclick: () => { filters.ages = []; onChange(); draw(); } }, 'Tout décocher'),
+        h('button', { class: 'btn primary grow', onclick: () => s.close() }, `Voir ${plural(visibleCount(), 'jeu', 'jeux')}`)));
+  };
+  const s = sheet(box, { title: 'Âge' });
+  draw();
+}
+
 /** Feuille de choix des styles (plusieurs possibles). Le filtre s'applique en direct. */
 function openStylePicker(onChange) {
   const box = h('div', { class: 'stack' });
   const draw = () => {
-    const count = sortedGames().filter((g) => gameMatches(g)).length;
+    const count = visibleCount();
     setChildren(box,
       h('div', { class: 'chips' }, GAME_STYLES.map((st) => {
         const on = filters.styles.includes(st.id);
@@ -120,6 +150,14 @@ function openStylePicker(onChange) {
   };
   const s = sheet(box, { title: 'Styles de jeu' });
   draw();
+}
+
+function ageChipLabel() {
+  const a = filters.ages;
+  if (a.length === 0) return 'Âge : tous';
+  if (a.length === 1) return `🎂 ${ageLabel(a[0])}`;
+  if (a.length <= 3 && !a.includes(0)) return `🎂 Dès ${a.join(', ')} ans`;
+  return `🎂 ${a.length} âges`;
 }
 
 function filterBar(onChange) {
@@ -150,11 +188,15 @@ function filterBar(onChange) {
     }, icon('heart', 16), 'Favoris'),
     chip('Joueurs', filters.players, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'players', (n) => `👥 ${n} joueur${n > 1 ? 's' : ''}`),
     chip('Durée', filters.duration, [15, 20, 30, 45, 60, 90, 120], 'duration', (n) => `⏱️ ${n} min max`),
-    chip('Âge', filters.age, [3, 4, 5, 6, 7, 8, 10, 12, 14], 'age', (n) => `🎂 ${n} ans`),
+    h('button', {
+      class: `chip-select ${filters.ages.length ? 'on' : ''}`, 'aria-label': 'Choisir les âges', 'aria-haspopup': 'dialog',
+      onclick: () => openAgePicker(onChange),
+    }, `${ageChipLabel()} ▾`),
     styleSelect,
-    (filters.favorites || filters.players != null || filters.duration != null || filters.age != null || filters.styles.length > 0) &&
+    (filters.favorites || filters.players != null || filters.duration != null || filters.ages.length > 0 || filters.styles.length > 0) &&
       h('button', { class: 'chip', onclick: () => {
-        filters.players = filters.duration = filters.age = null;
+        filters.players = filters.duration = null;
+        filters.ages = [];
         filters.favorites = false;
         filters.styles = [];
         onChange();

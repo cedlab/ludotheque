@@ -5,6 +5,7 @@ import { normalizeDice } from '../src/logic/dice.js';
 import { Store } from '../src/data/store.js';
 import { MemoryBackend } from '../src/data/backends.js';
 import { gameList, listById, normalizeList } from '../src/logic/collection.js';
+import { ageLabel, ageOptions, gameMatchesAges } from '../src/logic/ages.js';
 import { sampleData } from '../src/data/sample.js';
 
 describe('catalogue des jeux de la maison', () => {
@@ -161,5 +162,16 @@ describe('listes de jeux', () => {
     expect(gameList({ status: 'wishlist' })).toBe('wishlist');
     expect(normalizeList(undefined)).toBe('owned');
     expect(listById('wishlist').label).toBe('À acquérir');
+  });
+});
+
+describe('filtre par âge', () => {
+  const games = [{ minAge: 8 }, { minAge: 6 }, { minAge: 8 }, {}, { minAge: 12 }];
+  it('propose les âges présents et accepte plusieurs choix', () => {
+    expect(ageOptions(games)).toEqual([0, 6, 8, 12]);
+    expect(games.filter((g) => gameMatchesAges(g, []))).toHaveLength(5);
+    expect(games.filter((g) => gameMatchesAges(g, [6, 12]))).toHaveLength(2);
+    expect(games.filter((g) => gameMatchesAges(g, [0]))).toHaveLength(1);
+    expect(ageLabel(8)).toBe('Dès 8 ans');
   });
 });
