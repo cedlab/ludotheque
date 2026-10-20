@@ -835,6 +835,87 @@ textarea.input {
 .fav-btn:active .icon {
   transform: scale(1.25);
 }
+/* Favoris par joueur */
+.fans {
+  display: inline-flex;
+  align-items: center;
+}
+.fans .avatar {
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.fans .avatar + .avatar {
+  margin-left: -6px;
+}
+.fans-more {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.fan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
+  cursor: pointer;
+}
+.fan-row .icon {
+  color: var(--muted);
+  opacity: 0.5;
+}
+.fan-row.on {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--line));
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+}
+.fan-row.on .icon {
+  color: var(--danger);
+  fill: currentColor;
+  opacity: 1;
+}
+.fan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 4px;
+}
+.fans-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 32px);
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fans-card .grow {
+  display: flex;
+  flex-direction: column;
+}
+.fans-heart {
+  display: inline-grid;
+  color: var(--muted);
+}
+.fans-heart.on {
+  color: var(--danger);
+}
+.fans-heart.on .icon {
+  fill: currentColor;
+}
 .fav-chip {
   display: inline-flex;
   align-items: center;
@@ -1840,7 +1921,8 @@ html.picker-open body {
   font-size: 0.85rem;
   font-weight: 700;
 }
-.chip.style-chip.on {
+.chip.style-chip.on,
+.chip.fan-chip.on {
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 16%, var(--surface));
 }

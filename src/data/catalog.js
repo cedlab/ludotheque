@@ -379,7 +379,7 @@ export function catalogToMerge(existingGames = []) {
   const ownIds = new Set(existingGames.map((g) => g.id));
   const names = new Set(existingGames.filter((g) => !g.deleted).map((g) => normalizeName(g.name)));
   // Ce que la famille a choisi (favori, liste) ne doit pas être perdu à une mise à jour du catalogue.
-  const personal = new Map(existingGames.map((g) => [g.id, { favorite: g.favorite, status: g.status }]));
+  const personal = new Map(existingGames.map((g) => [g.id, { favorite: g.favorite, favoriteOf: g.favoriteOf, status: g.status }]));
   // Les jeux retirés (supprimés) passent toujours : leur suppression doit se propager.
   return catalogGames()
     .filter((g) => g.deleted || ownIds.has(g.id) || !names.has(normalizeName(g.name)))
@@ -388,6 +388,7 @@ export function catalogToMerge(existingGames = []) {
       if (!mine || g.deleted) return g;
       const out = { ...g };
       if (mine.favorite) out.favorite = true;
+      if (Array.isArray(mine.favoriteOf) && mine.favoriteOf.length) out.favoriteOf = [...mine.favoriteOf];
       if (mine.status) out.status = mine.status;
       return out;
     });

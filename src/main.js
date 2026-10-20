@@ -15,6 +15,7 @@ import { openPicker } from './ui/picker.js';
 import { h, plural } from './ui/dom.js';
 import { toast } from './ui/components.js';
 import { CATALOG_VERSION, catalogToMerge } from './data/catalog.js';
+import { migrateLegacyFavorites } from './logic/favorites.js';
 
 initTheme();
 registerServiceWorker();
@@ -74,8 +75,22 @@ function applyCatalog(store) {
   if (parts.length) setTimeout(() => toast(`Ludothèque de la maison : ${parts.join(', ')}.`), 600);
 }
 
+/**
+ * Les anciens cœurs (favoris communs) deviennent les favoris d'Aurélie. Refait
+ * après chaque réception de données : un autre téléphone peut en envoyer
+ * avant d'avoir été mis à jour, ou le profil d'Aurélie peut arriver plus tard.
+ */
+function migrateFavorites(store) {
+  const games = store.list('games');
+  for (const g of migrateLegacyFavorites(games, store.list('players'))) store.save('games', g);
+}
+
 initStore().then((store) => {
   applyCatalog(store);
+  migrateFavorites(store);
+  store.subscribe(({ source }) => {
+    if (source === 'external') queueMicrotask(() => migrateFavorites(store));
+  });
   startRouter();
   startSync(store);
 });

@@ -2,9 +2,11 @@
 import { store, navigate, refresh } from '../../app.js';
 import { h, plural, setChildren } from '../dom.js';
 import { icon } from '../icons.js';
-import { AVATARS, PLAYER_COLORS, avatar, confirmDialog, emptyState, header, sheet, toast } from '../components.js';
+import { AVATARS, PLAYER_COLORS, avatar, confirmDialog, emptyState, gameLogo, header, sheet, toast } from '../components.js';
 import { computeStats, filterHistory } from '../../logic/stats.js';
 import { sessionRow } from './sessions.js';
+import { sortedGames } from './games.js';
+import { fansOf } from '../../logic/favorites.js';
 
 export const sortedPlayers = () => store.list('players').sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 
@@ -86,7 +88,7 @@ export function playerDetailView({ id }) {
   const st = stats.players[id] || { played: 0, wins: 0, coopPlayed: 0, coopWins: 0, currentStreak: 0, bestStreak: 0 };
   const history = filterHistory(sessions, { playerId: id });
 
-  // Jeu préféré (le plus joué) et meilleurs scores détenus
+  // Jeu le plus joué et meilleurs scores détenus
   const counts = {};
   for (const s of history) counts[s.gameName] = (counts[s.gameName] || 0) + 1;
   const fav = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
@@ -111,12 +113,24 @@ export function playerDetailView({ id }) {
       statTile('📈', `${rate} %`, 'de réussite'),
       statTile('🔥', st.bestStreak, 'meilleure série'),
       st.coopPlayed > 0 && statTile('🤝', `${st.coopWins}/${st.coopPlayed}`, 'coop gagnées'),
-      fav && statTile('❤️', fav[0], 'jeu préféré', true)),
+      fav && statTile('🎯', fav[0], 'jeu le plus joué', true)),
+    favoritesCard(p),
     records.length > 0 && h('section', { class: 'card' }, h('h3', null, 'Records détenus'),
       h('ul', { class: 'list' }, records.map((r) => h('li', { class: 'row' }, h('span', { class: 'grow' }, r.name), h('strong', null, r.value))))),
     h('section', { class: 'card' }, h('h3', null, 'Historique'),
       history.length === 0 ? h('p', { class: 'muted' }, 'Aucune partie jouée.') : h('ul', { class: 'list' }, history.slice(0, 30).map((s) => sessionRow(s, { highlight: id })))),
     h('div', { class: 'pad' }, h('button', { class: 'btn danger-ghost', onclick: remove }, icon('trash'), 'Supprimer ce joueur')));
+}
+
+/** Jeux préférés du joueur ; on les ajoute avec le cœur des jeux (« Qui aime ce jeu ? »). */
+function favoritesCard(p) {
+  const games = sortedGames().filter((g) => fansOf(g).includes(p.id));
+  return h('section', { class: 'card' },
+    h('h3', null, `❤️ Ses jeux préférés${games.length ? ` (${games.length})` : ''}`),
+    games.length === 0
+      ? h('p', { class: 'muted' }, `Touchez le cœur d’un jeu et choisissez ${p.name} pour l’ajouter ici.`)
+      : h('ul', { class: 'game-grid compact' }, games.map((g) => h('li', null,
+          h('a', { class: 'game-card', href: `#/jeu/${g.id}` }, gameLogo(g, 56), h('span', { class: 'game-name' }, g.name))))));
 }
 
 export function statTile(emoji, value, label, wide = false) {
