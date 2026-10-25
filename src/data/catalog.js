@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 9;
+export const CATALOG_VERSION = 10;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -158,11 +158,36 @@ const GAMES = [
   ['Unanimo', 3, 12, 20, 7, sc('highest', { rounds: true })],
   // Ajouts (version 9)
   ['Rubik’s Race', 2, 2, 10, 7, HIGH, { notes: 'Le premier à reproduire le motif tiré gagne la manche.' }],
+  // Ajouts (version 10)
+  ['Rush Hour', 1, 1, 20, 8, HIGH, { notes: 'Casse-tête en solo : 40 défis de difficulté croissante.' }],
+  ['Pokémon : Académie de Combat', 2, 2, 20, 6, HIGH, { notes: 'Initiation au jeu de cartes Pokémon, avec decks prêts à jouer.' }],
+  ['Gagne ton papa !', 1, 2, 10, 5, HIGH, { notes: 'Le premier à remplir son rectangle avec ses pièces gagne la manche.' }],
+  ['Défis Nature', 2, 6, 20, 7, HIGH, { notes: 'Le joueur qui remporte toutes les cartes gagne. Plusieurs boîtes à la maison.' }],
+  ['Escargots… Prêts ? Partez !', 2, 6, 10, 3, HIGH, { dice: { count: 2, faces: 6 }, notes: 'Les dés de couleur font avancer les escargots.' }],
+  ['Gravity Maze', 1, 1, 20, 8, HIGH, { notes: 'Casse-tête en solo : 60 défis de difficulté croissante.' }],
+  ['Dr. Good !', 2, 6, 30, 10, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
+  ['La Cité d’Or', 1, 1, 15, 8, HIGH, { notes: 'Casse-tête Smart Games en solo, défis de difficulté croissante.' }],
+  ['Jenga', 1, 8, 15, 6, HIGH, { notes: 'Celui qui fait tomber la tour a perdu.' }],
+  ['Pyramide d’animaux', 2, 4, 15, 4, HIGH, { dice: { count: 1, faces: 6 }, notes: 'Le premier qui a posé tous ses animaux gagne.' }],
+  ['Unlock! Kids', 1, 4, 20, 6, COOP, { notes: 'Escape game coopératif. Deux boîtes à la maison.' }],
+  ['Memory : Les animaux', 2, 8, 20, 4, HIGH, { notes: 'Celui qui a le plus de paires gagne.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
 const STYLES = {
   'Rubik’s Race': ['rapidite', 'reflexion', 'famille'],
+  'Rush Hour': ['reflexion'],
+  'Pokémon : Académie de Combat': ['cartes', 'strategie', 'enfants'],
+  'Gagne ton papa !': ['reflexion', 'rapidite', 'famille'],
+  'Défis Nature': ['cartes', 'quiz', 'enfants'],
+  'Escargots… Prêts ? Partez !': ['des', 'enfants'],
+  'Gravity Maze': ['reflexion'],
+  'Dr. Good !': ['quiz', 'famille'],
+  'La Cité d’Or': ['reflexion'],
+  'Jenga': ['ambiance', 'famille'],
+  'Pyramide d’animaux': ['enfants', 'famille', 'des'],
+  'Unlock! Kids': ['coop', 'enfants', 'reflexion'],
+  'Memory : Les animaux': ['enfants', 'famille'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -286,6 +311,9 @@ const STYLES = {
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
   'Rubik’s Race': '🟨',
+  'Rush Hour': '🚗', 'Pokémon : Académie de Combat': '⚡', 'Gagne ton papa !': '🧩', 'Défis Nature': '🐾',
+  'Escargots… Prêts ? Partez !': '🐌', 'Gravity Maze': '🔮', 'Dr. Good !': '🩺', 'La Cité d’Or': '🪙',
+  'Jenga': '🪵', 'Pyramide d’animaux': '🐊', 'Unlock! Kids': '🐈‍⬛', 'Memory : Les animaux': '🐴',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
