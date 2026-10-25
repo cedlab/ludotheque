@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 10;
+export const CATALOG_VERSION = 11;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -171,6 +171,8 @@ const GAMES = [
   ['Pyramide d’animaux', 2, 4, 15, 4, HIGH, { dice: { count: 1, faces: 6 }, notes: 'Le premier qui a posé tous ses animaux gagne.' }],
   ['Unlock! Kids', 1, 4, 20, 6, COOP, { notes: 'Escape game coopératif. Deux boîtes à la maison.' }],
   ['Memory : Les animaux', 2, 8, 20, 4, HIGH, { notes: 'Celui qui a le plus de paires gagne.' }],
+  // Ajouts (version 11)
+  ['La Toupie voyageuse', 2, 4, 15, 4, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
@@ -188,6 +190,7 @@ const STYLES = {
   'Pyramide d’animaux': ['enfants', 'famille', 'des'],
   'Unlock! Kids': ['coop', 'enfants', 'reflexion'],
   'Memory : Les animaux': ['enfants', 'famille'],
+  'La Toupie voyageuse': ['enfants', 'famille'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -314,6 +317,7 @@ const ICONS = {
   'Rush Hour': '🚗', 'Pokémon : Académie de Combat': '⚡', 'Gagne ton papa !': '🧩', 'Défis Nature': '🐾',
   'Escargots… Prêts ? Partez !': '🐌', 'Gravity Maze': '🔮', 'Dr. Good !': '🩺', 'La Cité d’Or': '🪙',
   'Jenga': '🪵', 'Pyramide d’animaux': '🐊', 'Unlock! Kids': '🐈‍⬛', 'Memory : Les animaux': '🐴',
+  'La Toupie voyageuse': '🌀',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
