@@ -61,7 +61,11 @@ function applyCatalog(store) {
     /* stockage indisponible : on applique quand même, la fusion évite les doublons */
   }
   if (applied >= CATALOG_VERSION) return;
-  const stats = store.applyRemote({ games: catalogToMerge(store.list('games', { includeDeleted: true })) }, 'catalog');
+  const before = new Set(store.list('games', { includeDeleted: true }).map((g) => g.id));
+  const incoming = catalogToMerge(store.list('games', { includeDeleted: true }));
+  // Nouveaux jeux rangés dans « À tester » (idées à essayer), signalés à part.
+  const toTest = incoming.filter((g) => !before.has(g.id) && !g.deleted && g.status === 'totest').length;
+  const stats = store.applyRemote({ games: incoming }, 'catalog');
   try {
     localStorage.setItem(CATALOG_KEY, String(CATALOG_VERSION));
   } catch {
@@ -69,7 +73,8 @@ function applyCatalog(store) {
   }
   const { added, updated, deleted } = stats.games;
   const parts = [];
-  if (added > 0) parts.push(`${plural(added, 'jeu ajouté', 'jeux ajoutés')}`);
+  if (added - toTest > 0) parts.push(`${plural(added - toTest, 'jeu ajouté', 'jeux ajoutés')}`);
+  if (toTest > 0) parts.push(`${plural(toTest, 'idée', 'idées')} de jeu dans « À tester »`);
   if (deleted > 0) parts.push(`${plural(deleted, 'jeu retiré', 'jeux retirés')}`);
   if (!parts.length && updated > 0) parts.push(`${plural(updated, 'jeu mis', 'jeux mis')} à jour`);
   if (parts.length) setTimeout(() => toast(`Ludothèque de la maison : ${parts.join(', ')}.`), 600);

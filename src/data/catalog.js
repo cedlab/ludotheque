@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 11;
+export const CATALOG_VERSION = 12;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -173,6 +173,20 @@ const GAMES = [
   ['Memory : Les animaux', 2, 8, 20, 4, HIGH, { notes: 'Celui qui a le plus de paires gagne.' }],
   // Ajouts (version 11)
   ['La Toupie voyageuse', 2, 4, 15, 4, HIGH, { notes: 'Infos à vérifier sur la boîte.' }],
+  // Ajouts (version 12) : idées de jeux à essayer, rangées dans « À tester »
+  ['Harmonies', 1, 4, 40, 10, HIGH, { status: 'totest', notes: 'On construit des paysages avec des jetons pour y installer des animaux. Dans l’esprit de Cascadia.' }],
+  ['Everdell', 1, 4, 60, 10, HIGH, { status: 'totest', notes: 'Moteur de cartes dans une forêt d’animaux, au beau matériel.' }],
+  ['Earth', 1, 5, 60, 13, HIGH, { status: 'totest', notes: 'Moteur de cartes sur la nature, pour les amateurs de Wingspan et Ark Nova.' }],
+  ['Flip 7', 3, 18, 20, 8, sc('target', { target: 200, rounds: true }), { status: 'totest', notes: 'Stop ou encore : le premier à 200 points gagne.' }],
+  ['Les Cités perdues', 2, 2, 30, 10, sc('highest', { rounds: true }), { status: 'totest', notes: 'Un classique à deux, en 3 manches.' }],
+  ['Just One', 3, 7, 20, 8, sc('coop', { coopScore: true }), { status: 'totest', notes: 'Faire deviner des mots tous ensemble ; score sur 13 cartes.' }],
+  ['So Clover!', 3, 6, 30, 10, sc('coop', { coopScore: true }), { status: 'totest', notes: 'Association de mots coopérative.' }],
+  ['The Crew : Mission sous-marine', 2, 5, 20, 10, COOP, { status: 'totest', notes: 'La suite de The Crew : plis coopératifs, missions de plus en plus dures.' }],
+  ['Dixit', 3, 8, 30, 8, sc('target', { target: 30, rounds: true }), { status: 'totest', notes: 'Imagination et devinettes avec des cartes illustrées ; le premier à 30 points gagne.' }],
+  ['Zombie Kidz Évolution', 2, 4, 15, 7, COOP, { status: 'totest', notes: 'Coopératif qui évolue au fil des parties (autocollants à débloquer).' }],
+  ['Dragomino', 2, 4, 20, 5, HIGH, { status: 'totest', notes: 'La version enfants de Kingdomino.' }],
+  ['Unlock!', 1, 6, 60, 10, COOP, { status: 'totest', notes: 'Escape game en cartes, version classique : l’étape après Unlock! Kids.' }],
+  ['Heat : Pedal to the Metal', 1, 6, 45, 10, HIGH, { status: 'totest', notes: 'Course de voitures avec des cartes : le premier à franchir la ligne d’arrivée gagne.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
@@ -191,6 +205,19 @@ const STYLES = {
   'Unlock! Kids': ['coop', 'enfants', 'reflexion'],
   'Memory : Les animaux': ['enfants', 'famille'],
   'La Toupie voyageuse': ['enfants', 'famille'],
+  'Harmonies': ['famille', 'strategie', 'reflexion'],
+  'Everdell': ['strategie', 'cartes'],
+  'Earth': ['strategie', 'cartes'],
+  'Flip 7': ['cartes', 'ambiance', 'famille'],
+  'Les Cités perdues': ['cartes', 'strategie'],
+  'Just One': ['coop', 'mots', 'ambiance'],
+  'So Clover!': ['coop', 'mots'],
+  'The Crew : Mission sous-marine': ['coop', 'cartes'],
+  'Dixit': ['ambiance', 'famille'],
+  'Zombie Kidz Évolution': ['coop', 'enfants'],
+  'Dragomino': ['enfants', 'famille'],
+  'Unlock!': ['coop', 'reflexion'],
+  'Heat : Pedal to the Metal': ['famille', 'strategie', 'cartes'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -318,6 +345,9 @@ const ICONS = {
   'Escargots… Prêts ? Partez !': '🐌', 'Gravity Maze': '🔮', 'Dr. Good !': '🩺', 'La Cité d’Or': '🪙',
   'Jenga': '🪵', 'Pyramide d’animaux': '🐊', 'Unlock! Kids': '🐈‍⬛', 'Memory : Les animaux': '🐴',
   'La Toupie voyageuse': '🌀',
+  'Harmonies': '🏞️', 'Everdell': '🌲', 'Earth': '🌱', 'Flip 7': '7️⃣', 'Les Cités perdues': '🗺️', 'Just One': '☝️',
+  'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
+  'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',

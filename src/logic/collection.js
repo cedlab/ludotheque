@@ -1,7 +1,8 @@
-// Où en est un jeu : à la maison, testé ailleurs (asso, amis…) ou à acquérir — module pur.
+// Où en est un jeu : à la maison, à tester, testé ailleurs (asso, amis…) ou à acquérir — module pur.
 
 export const GAME_LISTS = [
   { id: 'owned', label: 'Ma ludothèque', tab: 'Maison', one: 'À la maison', added: 'ajouté à la ludothèque', emoji: '🏠' },
+  { id: 'totest', label: 'À tester', tab: 'À tester', one: 'À tester', added: 'ajouté à la liste « À tester »', emoji: '🔍' },
   { id: 'tested', label: 'Testés', tab: 'Testés', one: 'Testé', added: 'ajouté aux jeux testés', emoji: '🧪' },
   { id: 'wishlist', label: 'À acquérir', tab: 'À acquérir', one: 'À acquérir', added: 'ajouté à la liste « À acquérir »', emoji: '🛒' },
 ];

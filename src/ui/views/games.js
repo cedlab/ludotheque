@@ -57,6 +57,7 @@ export function moveGame(id, status) {
 }
 
 const LIST_EMPTY = {
+  totest: ['🔍', 'Rien à tester pour l’instant', 'Notez ici les jeux repérés qui vous tentent, pour les essayer à l’association, chez des amis ou en boutique.'],
   tested: ['🧪', 'Aucun jeu testé', 'Notez ici les jeux essayés à l’association ou chez des amis, pour vous en souvenir.'],
   wishlist: ['🛒', 'Rien à acquérir pour l’instant', 'Ajoutez les jeux qui vous font envie : pratique pour une idée de cadeau.'],
 };
@@ -458,13 +459,21 @@ function fansCard(g) {
 }
 
 /** Fiche d'un jeu testé ou à acquérir : où il en est, et de quoi le faire avancer. */
+const LIST_BADGE = {
+  totest: 'À tester',
+  tested: 'Testé, pas encore à la maison',
+  wishlist: 'Sur la liste « À acquérir »',
+};
+
 function listCard(g) {
-  const l = listById(gameList(g));
+  const list = gameList(g);
   const go = (status) => { moveGame(g.id, status); refresh(); };
   return h('section', { class: 'card stack list-card' },
-    h('p', { class: 'list-badge' }, `${l.emoji} ${gameList(g) === 'tested' ? 'Testé, pas encore à la maison' : 'Sur la liste « À acquérir »'}`),
-    h('button', { class: 'btn primary', onclick: () => go('owned') }, '🏠 Je l’ai, il est à la maison'),
-    gameList(g) === 'tested' && h('button', { class: 'btn', onclick: () => go('wishlist') }, '🛒 Ajouter à « À acquérir »'));
+    h('p', { class: 'list-badge' }, `${listById(list).emoji} ${LIST_BADGE[list]}`),
+    list === 'totest' && h('button', { class: 'btn primary', onclick: () => go('tested') }, '🧪 Je l’ai testé'),
+    list !== 'wishlist' && h('button', { class: 'btn', onclick: () => go('wishlist') }, '🛒 Ajouter à « À acquérir »'),
+    h('button', { class: `btn ${list === 'totest' ? '' : 'primary'}`, onclick: () => go('owned') }, '🏠 Je l’ai, il est à la maison'),
+    list === 'totest' && h('p', { class: 'muted small' }, 'Il ne vous plaît pas ? Supprimez-le avec le bouton en bas de la fiche.'));
 }
 
 function fact(ic, text) {

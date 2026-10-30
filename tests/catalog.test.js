@@ -159,6 +159,7 @@ describe('listes de jeux', () => {
     expect(gameList({})).toBe('owned');
     expect(gameList({ status: 'bidon' })).toBe('owned');
     expect(gameList({ status: 'tested' })).toBe('tested');
+    expect(gameList({ status: 'totest' })).toBe('totest');
     expect(gameList({ status: 'wishlist' })).toBe('wishlist');
     expect(normalizeList(undefined)).toBe('owned');
     expect(listById('wishlist').label).toBe('À acquérir');

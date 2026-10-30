@@ -33,6 +33,7 @@ export function gameFormView({ id }, query = {}) {
   const listHelp = h('p', { class: 'muted small' });
   const LIST_HELP = {
     owned: 'Le jeu est à la maison : il est proposé par « À quoi joue-t-on ? ».',
+    totest: 'Un jeu repéré qui vous tente, à essayer avant de l’acheter.',
     tested: 'Essayé ailleurs (association, amis…), pas à la maison.',
     wishlist: 'Un jeu qui vous fait envie, à acheter ou à demander en cadeau.',
   };
