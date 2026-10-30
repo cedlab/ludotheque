@@ -314,8 +314,10 @@ export function playView({ id }) {
   const wrap = h('div', { class: 'play' });
   let saveTimer = null;
   let showRounds = false;
+  let cancelled = false;
 
   const persist = () => {
+    if (cancelled) return; // une partie annulée ne doit pas réapparaître
     clearTimeout(saveTimer);
     saveTimer = null;
     const saved = store.save('sessions', s);
@@ -360,6 +362,21 @@ export function playView({ id }) {
     persist();
     vibrate([60, 40, 200]);
     navigate(`/partie/${id}`, { replace: true });
+  };
+
+  /** Partie lancée par erreur : on la supprime (elle reste dans la corbeille). */
+  const cancelGame = async () => {
+    const tot = totals(sc, s, entrantIds(s));
+    const started = Object.values(tot).some((v) => v !== 0) || s.coop?.result || s.coop?.score || s.rounds.length > 1;
+    if (started && !(await confirmDialog('Annuler cette partie ? Elle n’apparaîtra pas dans l’historique (en cas d’erreur, elle reste récupérable dans la corbeille).',
+      { ok: 'Annuler la partie', cancel: 'Continuer à jouer', danger: true }))) return;
+    cancelled = true;
+    clearTimeout(saveTimer);
+    store.remove('sessions', id);
+    navigate(store.get('games', s.gameId) ? `/jeu/${s.gameId}` : '/parties', { replace: true });
+    toast('Partie annulée.', { action: 'Rétablir', duration: 6000, onAction: () => {
+      if (store.restore('sessions', id)) navigate(`/partie/${id}`);
+    } });
   };
 
   const editRoundCell = async (ri, e) => {
@@ -441,6 +458,8 @@ export function playView({ id }) {
         segmented(STEPS.map((v, i) => ({ value: i, label: `${isCountdown ? '' : '±'}${v}` })), stepIndex, (i) => { stepIndex = i; draw(); })),
       cards,
       roundsTable,
+      h('div', { class: 'pad center-text' },
+        h('button', { class: 'btn ghost small', onclick: cancelGame }, icon('close', 18), 'Annuler la partie')),
       h('div', { class: 'sticky-actions' },
         sc.rounds && sc.mode !== MODES.COOP && h('button', { class: 'btn ghost', 'aria-pressed': String(showRounds), onclick: () => { showRounds = !showRounds; draw(); } }, showRounds ? 'Masquer' : 'Manches'),
         sc.rounds && sc.mode !== MODES.COOP && h('button', { class: 'btn primary grow', onclick: () => {
