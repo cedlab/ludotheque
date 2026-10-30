@@ -178,13 +178,26 @@ describe('filtre par âge', () => {
 });
 
 describe('avis sur un jeu', () => {
-  it('note bornée, commentaire nettoyé, avis vide = null', async () => {
-    const { normalizeReview, stars } = await import('../src/logic/review.js');
-    expect(normalizeReview({ rating: 4, comment: '  Super à 4  ', at: 5 })).toEqual({ rating: 4, comment: 'Super à 4', at: 5 });
+  it('demi-étoiles, commentaire nettoyé, avis vide = null', async () => {
+    const { normalizeReview, starFills, ratingLabel, formatRating } = await import('../src/logic/review.js');
+    expect(normalizeReview({ rating: 4.5, comment: '  Super à 4  ', at: 5 })).toEqual({ rating: 4.5, comment: 'Super à 4', at: 5 });
+    expect(normalizeReview({ rating: 3.3 }).rating).toBe(3.5);
     expect(normalizeReview({ rating: 9 }).rating).toBe(5);
     expect(normalizeReview({ rating: 0, comment: '   ' })).toBeNull();
     expect(normalizeReview(null)).toBeNull();
-    expect(stars(3)).toBe('★★★☆☆');
+    expect(starFills(3.5)).toEqual([1, 1, 1, 0.5, 0]);
+    expect(ratingLabel(4.5)).toBe('Très bien');
+    expect(ratingLabel(0.5)).toBe('Pas pour nous');
+    expect(formatRating(4.5)).toBe('4,5');
+  });
+
+  it('filtre par note', async () => {
+    const { gameMatchesRating } = await import('../src/logic/review.js');
+    const games = [{ review: { rating: 5 } }, { review: { rating: 3.5 } }, { review: { comment: 'pas noté' } }, {}];
+    expect(games.filter((g) => gameMatchesRating(g, null))).toHaveLength(4);
+    expect(games.filter((g) => gameMatchesRating(g, 3.5))).toHaveLength(2);
+    expect(games.filter((g) => gameMatchesRating(g, 4))).toHaveLength(1);
+    expect(games.filter((g) => gameMatchesRating(g, -1))).toHaveLength(2);
   });
 });
 

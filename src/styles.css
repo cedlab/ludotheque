@@ -854,39 +854,59 @@ textarea.input {
   cursor: pointer;
 }
 
-/* Avis : étoiles */
+/* Avis : étoiles (demi-étoiles comprises) */
+.star-cell {
+  position: relative;
+  display: inline-block;
+  color: var(--line);
+  line-height: 1;
+}
+.star-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  color: #f2b01e;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.stars-view {
+  display: inline-flex;
+  gap: 2px;
+}
 .stars-input {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
+  font-size: 2.9rem;
 }
-.stars-input .star {
-  width: 52px;
-  height: 52px;
+.star-half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  padding: 0;
   border: 0;
   background: none;
-  color: var(--line);
-  font-size: 2.6rem;
-  line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
-.stars-input .star.on {
-  color: #f2b01e;
+.star-half.left {
+  left: 0;
+}
+.star-half.right {
+  right: 0;
 }
 .review-stars {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
   margin: 0;
-  color: #f2b01e;
-  font-size: 1.4rem;
-  letter-spacing: 2px;
 }
 .review-stars small {
   color: var(--muted);
   font-size: 0.9rem;
-  letter-spacing: 0;
 }
 
 /* Favoris par joueur */

@@ -10,7 +10,7 @@ import { computeStats, filterHistory } from '../../logic/stats.js';
 import { GAME_LISTS, gameList, listById } from '../../logic/collection.js';
 import { ageLabel, ageOptions, gameMatchesAges } from '../../logic/ages.js';
 import { fansOf, gameMatchesFans, toggleFan } from '../../logic/favorites.js';
-import { MAX_STARS, RATING_LABELS, normalizeReview, stars } from '../../logic/review.js';
+import { MAX_STARS, formatRating, gameMatchesRating, gameRating, normalizeRating, normalizeReview, ratingLabel, starFills } from '../../logic/review.js';
 import { samplesFor } from '../../data/sample.js';
 import { normalizeName } from '../../data/catalog.js';
 import { formatImportSummary } from '../../data/merge.js';
@@ -18,7 +18,7 @@ import { sessionRow } from './sessions.js';
 import { sortedPlayers } from './players.js';
 
 // Filtres conservés pendant la session d'utilisation.
-const filters = { list: 'owned', fans: [], fansMode: 'any', players: null, duration: null, ages: [], styles: [], styleMode: 'any', q: '' };
+const filters = { list: 'owned', fans: [], fansMode: 'any', players: null, duration: null, rating: null, ages: [], styles: [], styleMode: 'any', q: '' };
 
 export function gameMatches(g, f = filters) {
   if (!gameMatchesFans(g, f.fans, f.fansMode)) return false;
@@ -28,6 +28,7 @@ export function gameMatches(g, f = filters) {
   }
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
   if (!gameMatchesAges(g, f.ages)) return false;
+  if (!gameMatchesRating(g, f.rating)) return false;
   // La recherche porte sur le nom et sur l'éditeur (« smart games », « haba »…).
   if (f.q && !normalizeName(`${g.name} ${g.publisher || ''}`).includes(normalizeName(f.q))) return false;
   if (!gameMatchesStyles(g, f.styles, f.styleMode)) return false;
@@ -41,8 +42,7 @@ export function gameMeta(g) {
   }
   if (g.duration) parts.push(`${g.duration} min`);
   if (g.minAge) parts.push(`${g.minAge} ans+`);
-  const review = normalizeReview(g.review);
-  if (review?.rating) parts.push(`${review.rating}★`);
+  if (gameRating(g)) parts.push(`${formatRating(gameRating(g))}★`);
   return parts.join(' · ');
 }
 
@@ -268,14 +268,16 @@ function filterBar(onChange) {
     }, icon('heart', 16), `${fansChipLabel()} ▾`),
     chip('Joueurs', filters.players, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'players', (n) => `👥 ${n} joueur${n > 1 ? 's' : ''}`),
     chip('Durée', filters.duration, [15, 20, 30, 45, 60, 90, 120], 'duration', (n) => `⏱️ ${n} min max`),
+    chip('Note', filters.rating, [5, 4.5, 4, 3.5, 3, 2, 1, -1], 'rating',
+      (n) => (n === -1 ? '☆ Pas encore notés' : n === 5 ? '★ 5 étoiles' : `★ ${formatRating(n)} et plus`)),
     h('button', {
       class: `chip-select ${filters.ages.length ? 'on' : ''}`, 'aria-label': 'Choisir les âges', 'aria-haspopup': 'dialog',
       onclick: () => openAgePicker(onChange),
     }, `${ageChipLabel()} ▾`),
     styleSelect,
-    (filters.fans.length > 0 || filters.players != null || filters.duration != null || filters.ages.length > 0 || filters.styles.length > 0) &&
+    (filters.fans.length > 0 || filters.players != null || filters.duration != null || filters.rating != null || filters.ages.length > 0 || filters.styles.length > 0) &&
       h('button', { class: 'chip', onclick: () => {
-        filters.players = filters.duration = null;
+        filters.players = filters.duration = filters.rating = null;
         filters.ages = [];
         filters.fans = [];
         filters.styles = [];
@@ -466,6 +468,13 @@ function fansCard(g) {
     fans.length ? fanAvatars(fans, 28) : h('span', { class: 'link' }, 'Ajouter'));
 }
 
+/** Étoiles en lecture seule (demi-étoiles comprises). */
+export function starsView(rating, size = 22) {
+  return h('span', { class: 'stars-view', style: { fontSize: `${size}px` }, role: 'img', 'aria-label': `${formatRating(rating)} sur ${MAX_STARS}` },
+    starFills(rating).map((f) => h('span', { class: 'star-cell' }, '★',
+      h('span', { class: 'star-fill', style: { width: `${f * 100}%` } }, '★'))));
+}
+
 /**
  * Fenêtre « Notre avis » : des étoiles et un commentaire. `then` reçoit l'avis
  * (ou null) ; avec `skip`, un second bouton permet de continuer sans avis.
@@ -477,13 +486,17 @@ export function openReviewSheet(gameId, { title, saveLabel = 'Enregistrer', skip
   let rating = current.rating;
   const starsRow = h('div', { class: 'stars-input', role: 'radiogroup', 'aria-label': 'Note' });
   const label = h('p', { class: 'muted small center-text' });
+  // Chaque étoile a deux moitiés : à gauche la demi-étoile, à droite l'étoile entière.
+  const half = (value, side) => h('button', {
+    type: 'button', class: `star-half ${side}`, role: 'radio', 'aria-checked': String(value === rating),
+    'aria-label': `${formatRating(value)} sur ${MAX_STARS}`,
+    onclick: () => { rating = rating === value ? 0 : normalizeRating(value); vibrate(10); drawStars(); },
+  });
   const drawStars = () => {
-    setChildren(starsRow, Array.from({ length: MAX_STARS }, (_, i) => h('button', {
-      type: 'button', class: `star ${i < rating ? 'on' : ''}`, role: 'radio', 'aria-checked': String(i + 1 === rating),
-      'aria-label': `${i + 1} sur ${MAX_STARS} : ${RATING_LABELS[i + 1]}`,
-      onclick: () => { rating = rating === i + 1 ? 0 : i + 1; vibrate(10); drawStars(); },
-    }, '★')));
-    label.textContent = rating ? RATING_LABELS[rating] : 'Touchez les étoiles pour noter';
+    setChildren(starsRow, starFills(rating).map((f, i) => h('span', { class: 'star-cell' }, '★',
+      h('span', { class: 'star-fill', style: { width: `${f * 100}%` } }, '★'),
+      half(i + 0.5, 'left'), half(i + 1, 'right'))));
+    label.textContent = rating ? `${formatRating(rating)} / ${MAX_STARS} · ${ratingLabel(rating)}` : 'Touchez une étoile pour noter (à gauche : demi-étoile)';
   };
   drawStars();
   const comment = h('textarea', { class: 'input', rows: '4', maxlength: '1000',
@@ -510,18 +523,19 @@ function saveReview(id, review, status) {
 function reviewCard(g) {
   const review = normalizeReview(g.review);
   const list = gameList(g);
-  if (!review && list !== 'totest' && list !== 'tested') return null;
   const edit = () => openReviewSheet(g.id, { then: (r) => { if (r !== undefined) { saveReview(g.id, r); refresh(); } } });
   return h('section', { class: 'card stack' },
     h('div', { class: 'row gap' }, h('h3', { class: 'grow' }, '💬 Notre avis'),
-      h('button', { class: 'btn small ghost', onclick: edit }, review ? 'Modifier' : 'Donner notre avis')),
+      h('button', { class: 'btn small ghost', onclick: edit }, review ? 'Modifier' : 'Noter ce jeu')),
     review
-      ? [review.rating > 0 && h('p', { class: 'review-stars' }, h('span', { 'aria-hidden': 'true' }, stars(review.rating)), h('small', null, RATING_LABELS[review.rating])),
+      ? [review.rating > 0 && h('p', { class: 'review-stars' }, starsView(review.rating, 26),
+            h('small', null, `${formatRating(review.rating)} / ${MAX_STARS} · ${ratingLabel(review.rating)}`)),
           review.comment && h('p', { class: 'notes' }, review.comment),
           review.at > 0 && h('p', { class: 'muted small' }, `Le ${formatDate(review.at)}`)]
       : h('p', { class: 'muted' }, list === 'totest'
         ? 'Après l’avoir essayé, touchez « Je l’ai testé » : vous pourrez le noter et écrire ce que vous en avez pensé.'
-        : 'Notez-le et écrivez ce que vous en avez pensé, pour vous en souvenir.'));
+        : list === 'owned' ? 'Notez-le avec des étoiles et ajoutez un commentaire si vous voulez.'
+          : 'Notez-le et écrivez ce que vous en avez pensé, pour vous en souvenir.'));
 }
 
 /** Fiche d'un jeu testé ou à acquérir : où il en est, et de quoi le faire avancer. */
