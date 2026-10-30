@@ -353,6 +353,10 @@ const STYLES = {
   'The Crew : en quête de la neuvième planète': ['coop', 'cartes'],
 };
 
+// Éditeurs (édition française). Laissés vides quand ils ne sont pas confirmés.
+const PUBLISHERS = {
+};
+
 // Vignettes : un dessin (emoji) qui évoque chaque jeu.
 const ICONS = {
   'Rubik’s Race': '🟨',
@@ -435,6 +439,7 @@ export function catalogGames() {
     dice: null,
     icon: ICONS[name] || null,
     styles: STYLES[name] || [],
+    publisher: PUBLISHERS[name] || '',
     notes: '',
     ...structuredClone(extra),
   })).map((g) => (REMOVED.has(g.name) ? { ...g, deleted: true, updatedAt: REMOVED_AT } : g));
@@ -448,6 +453,26 @@ export function normalizeName(name = '') {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+/**
+ * Éditeurs à compléter : jeux déjà présents (du catalogue, ou saisis à la main
+ * sous le même nom) qui n'ont pas encore d'éditeur. Seul ce champ change, le
+ * reste de la fiche (modifiée ou non sur le téléphone) est conservé.
+ */
+export function publishersToFill(existingGames = []) {
+  const byId = new Map();
+  const byName = new Map();
+  for (const g of catalogGames()) {
+    if (!g.publisher) continue;
+    byId.set(g.id, g.publisher);
+    byName.set(normalizeName(g.name), g.publisher);
+  }
+  return existingGames
+    .filter((g) => !g.deleted && !g.publisher)
+    .map((g) => ({ g, publisher: byId.get(g.id) || byName.get(normalizeName(g.name)) }))
+    .filter((x) => x.publisher)
+    .map(({ g, publisher }) => ({ ...g, publisher }));
 }
 
 /**

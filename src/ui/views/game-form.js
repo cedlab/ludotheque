@@ -151,12 +151,21 @@ export function gameFormView({ id }, query = {}) {
   };
   renderDice();
 
+  // Éditeur : suggestions tirées des éditeurs déjà connus.
+  const publishers = [...new Set(store.list('games').map((x) => (x.publisher || '').trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'fr'));
+  const publisherInput = h('input', { class: 'input', type: 'text', value: g.publisher || '', list: 'publishers',
+    placeholder: 'Ex. : Smart Games, HABA, Gigamic…', maxlength: '60', autocomplete: 'off', 'aria-label': 'Éditeur',
+    oninput: () => (g.publisher = publisherInput.value) });
+  const publisherList = h('datalist', { id: 'publishers' }, publishers.map((p) => h('option', { value: p })));
+
   const notes = h('textarea', { class: 'input', rows: '4', placeholder: 'Règles maison, rappels, extensions…',
     oninput: () => (g.notes = notes.value) }, g.notes || '');
 
   const save = (e) => {
     e.preventDefault();
     g.name = nameInput.value.trim();
+    g.publisher = publisherInput.value.trim();
     if (!g.name) {
       toast('Donnez un nom au jeu.');
       nameInput.focus();
@@ -178,7 +187,8 @@ export function gameFormView({ id }, query = {}) {
       h('div', { class: 'field-row' }, h('span', null, 'Joueurs min.'), minStep),
       h('div', { class: 'field-row' }, h('span', null, 'Joueurs max.'), maxStep),
       h('div', { class: 'field-row' }, h('span', null, 'Durée'), durationStep),
-      h('div', { class: 'field-row' }, h('span', null, 'Âge minimum'), ageStep)),
+      h('div', { class: 'field-row' }, h('span', null, 'Âge minimum'), ageStep),
+      h('label', { class: 'field' }, h('span', null, 'Éditeur'), publisherInput, publisherList)),
     h('section', { class: 'card stack' }, h('h3', null, 'Comptage des points'), scoringBox),
     h('section', { class: 'card stack' }, h('h3', null, 'Style de jeu'), h('p', { class: 'muted small' }, 'Plusieurs choix possibles.'), stylesBox),
     h('section', { class: 'card stack' }, h('h3', null, 'Dés'), diceBox),

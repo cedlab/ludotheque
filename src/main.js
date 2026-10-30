@@ -14,7 +14,7 @@ import { startSync } from './sync/index.js';
 import { openPicker } from './ui/picker.js';
 import { h, plural } from './ui/dom.js';
 import { toast } from './ui/components.js';
-import { CATALOG_VERSION, catalogToMerge } from './data/catalog.js';
+import { CATALOG_VERSION, catalogToMerge, publishersToFill } from './data/catalog.js';
 import { migrateLegacyFavorites } from './logic/favorites.js';
 
 initTheme();
@@ -66,6 +66,7 @@ function applyCatalog(store) {
   // Nouveaux jeux rangés dans « À tester » (idées à essayer), signalés à part.
   const toTest = incoming.filter((g) => !before.has(g.id) && !g.deleted && g.status === 'totest').length;
   const stats = store.applyRemote({ games: incoming }, 'catalog');
+  for (const g of publishersToFill(store.list('games'))) store.save('games', g);
   try {
     localStorage.setItem(CATALOG_KEY, String(CATALOG_VERSION));
   } catch {

@@ -429,6 +429,12 @@ p {
 textarea.input {
   resize: vertical;
 }
+.field:not(.inline) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
 .field-row,
 .field.inline {
   display: flex;
@@ -838,6 +844,16 @@ textarea.input {
 .fav-btn:active .icon {
   transform: scale(1.25);
 }
+.fact-link {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--primary-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 /* Avis : étoiles */
 .stars-input {
   display: flex;

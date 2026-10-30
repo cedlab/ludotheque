@@ -28,7 +28,8 @@ export function gameMatches(g, f = filters) {
   }
   if (f.duration != null && g.duration && g.duration > f.duration) return false;
   if (!gameMatchesAges(g, f.ages)) return false;
-  if (f.q && !normalizeName(g.name).includes(normalizeName(f.q))) return false;
+  // La recherche porte sur le nom et sur l'éditeur (« smart games », « haba »…).
+  if (f.q && !normalizeName(`${g.name} ${g.publisher || ''}`).includes(normalizeName(f.q))) return false;
   if (!gameMatchesStyles(g, f.styles, f.styleMode)) return false;
   return true;
 }
@@ -324,7 +325,7 @@ export function gamesView() {
   const heroSub = h('small');
   const results = h('div');
   const search = h('input', {
-    class: 'input search', type: 'search', placeholder: '🔍 Rechercher un jeu…', value: filters.q,
+    class: 'input search', type: 'search', placeholder: '🔍 Rechercher un jeu, un éditeur…', value: filters.q,
     'aria-label': 'Rechercher un jeu', autocomplete: 'off', enterkeyhint: 'search',
     oninput: () => { filters.q = search.value; drawResults(); },
   });
@@ -425,6 +426,9 @@ export function gameDetailView({ id }) {
         fact('users', g.minPlayers === g.maxPlayers ? plural(g.minPlayers, 'joueur', 'joueurs') : `${g.minPlayers || 1} à ${g.maxPlayers || '∞'} joueurs`),
         g.duration ? fact('clock', `${g.duration} min`) : null,
         g.minAge ? fact('cake', `Dès ${g.minAge} ans`) : null,
+        g.publisher && h('button', { type: 'button', class: 'fact fact-link', 'aria-label': `Voir les jeux de ${g.publisher}`,
+          onclick: () => { filters.q = g.publisher; filters.list = gameList(g); navigate('/'); } },
+        icon('tag', 20), h('span', null, g.publisher)),
         fact('trophy', describeScoring(g.scoring)),
         normalizeDice(g.dice) && fact('dice', `Dés : ${describeDice(normalizeDice(g.dice))}`),
         gameStyles(g).length > 0 && h('div', { class: 'style-tags' }, gameStyles(g).map((id) => {
