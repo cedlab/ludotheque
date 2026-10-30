@@ -838,6 +838,41 @@ textarea.input {
 .fav-btn:active .icon {
   transform: scale(1.25);
 }
+/* Avis : étoiles */
+.stars-input {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.stars-input .star {
+  width: 52px;
+  height: 52px;
+  border: 0;
+  background: none;
+  color: var(--line);
+  font-size: 2.6rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.stars-input .star.on {
+  color: #f2b01e;
+}
+.review-stars {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  color: #f2b01e;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+}
+.review-stars small {
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+
 /* Favoris par joueur */
 .fans {
   display: inline-flex;

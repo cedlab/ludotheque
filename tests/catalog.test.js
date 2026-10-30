@@ -176,3 +176,14 @@ describe('filtre par âge', () => {
     expect(ageLabel(8)).toBe('Dès 8 ans');
   });
 });
+
+describe('avis sur un jeu', () => {
+  it('note bornée, commentaire nettoyé, avis vide = null', async () => {
+    const { normalizeReview, stars } = await import('../src/logic/review.js');
+    expect(normalizeReview({ rating: 4, comment: '  Super à 4  ', at: 5 })).toEqual({ rating: 4, comment: 'Super à 4', at: 5 });
+    expect(normalizeReview({ rating: 9 }).rating).toBe(5);
+    expect(normalizeReview({ rating: 0, comment: '   ' })).toBeNull();
+    expect(normalizeReview(null)).toBeNull();
+    expect(stars(3)).toBe('★★★☆☆');
+  });
+});

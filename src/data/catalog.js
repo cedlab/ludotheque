@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 12;
+export const CATALOG_VERSION = 13;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -187,6 +187,14 @@ const GAMES = [
   ['Dragomino', 2, 4, 20, 5, HIGH, { status: 'totest', notes: 'La version enfants de Kingdomino.' }],
   ['Unlock!', 1, 6, 60, 10, COOP, { status: 'totest', notes: 'Escape game en cartes, version classique : l’étape après Unlock! Kids.' }],
   ['Heat : Pedal to the Metal', 1, 6, 45, 10, HIGH, { status: 'totest', notes: 'Course de voitures avec des cartes : le premier à franchir la ligne d’arrivée gagne.' }],
+  // Ajouts (version 13) : vus à l'association, rangés dans « À tester »
+  ['Loco Circus', 1, 1, 10, 3, HIGH, { status: 'totest', notes: 'Smart Games, 48 défis de facile à difficile : préparer Firmin le train.' }],
+  ['IQ Love', 1, 1, 10, 6, HIGH, { status: 'totest', notes: 'Casse-tête Smart Games, 120 défis. Nom et infos à vérifier sur la boîte.' }],
+  ['La Fée aux fleurs', 1, 4, 10, 2, HIGH, { status: 'totest', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
+  ['Little Cooperation', 1, 4, 10, 2, COOP, { status: 'totest', notes: 'Djeco, premier jeu coopératif (2 ans et demi à 5 ans).' }],
+  ['Rhino Hero Junior', 1, 4, 10, 2, HIGH, { status: 'totest', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
+  ['Keekee', 2, 4, 15, 4, HIGH, { status: 'totest', notes: 'Infos à vérifier sur la boîte.' }],
+  ['Tactilo Loto', 1, 4, 10, 3, HIGH, { status: 'totest', notes: 'Djeco : reconnaître les animaux au toucher.' }],
 ];
 
 // Styles de jeu (voir logic/styles.js).
@@ -218,6 +226,13 @@ const STYLES = {
   'Dragomino': ['enfants', 'famille'],
   'Unlock!': ['coop', 'reflexion'],
   'Heat : Pedal to the Metal': ['famille', 'strategie', 'cartes'],
+  'Loco Circus': ['reflexion', 'enfants'],
+  'IQ Love': ['reflexion'],
+  'La Fée aux fleurs': ['enfants'],
+  'Little Cooperation': ['coop', 'enfants'],
+  'Rhino Hero Junior': ['enfants', 'rapidite'],
+  'Keekee': ['enfants'],
+  'Tactilo Loto': ['enfants'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -348,6 +363,8 @@ const ICONS = {
   'Harmonies': '🏞️', 'Everdell': '🌲', 'Earth': '🌱', 'Flip 7': '7️⃣', 'Les Cités perdues': '🗺️', 'Just One': '☝️',
   'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
   'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
+  'Loco Circus': '🚂', 'IQ Love': '💖', 'La Fée aux fleurs': '🧚', 'Little Cooperation': '🦭', 'Rhino Hero Junior': '🦏',
+  'Keekee': '🐒', 'Tactilo Loto': '✋',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
@@ -441,7 +458,7 @@ export function catalogToMerge(existingGames = []) {
   const ownIds = new Set(existingGames.map((g) => g.id));
   const names = new Set(existingGames.filter((g) => !g.deleted).map((g) => normalizeName(g.name)));
   // Ce que la famille a choisi (favori, liste) ne doit pas être perdu à une mise à jour du catalogue.
-  const personal = new Map(existingGames.map((g) => [g.id, { favorite: g.favorite, favoriteOf: g.favoriteOf, status: g.status }]));
+  const personal = new Map(existingGames.map((g) => [g.id, { favorite: g.favorite, favoriteOf: g.favoriteOf, status: g.status, review: g.review }]));
   // Les jeux retirés (supprimés) passent toujours : leur suppression doit se propager.
   return catalogGames()
     .filter((g) => g.deleted || ownIds.has(g.id) || !names.has(normalizeName(g.name)))
@@ -452,6 +469,7 @@ export function catalogToMerge(existingGames = []) {
       if (mine.favorite) out.favorite = true;
       if (Array.isArray(mine.favoriteOf) && mine.favoriteOf.length) out.favoriteOf = [...mine.favoriteOf];
       if (mine.status) out.status = mine.status;
+      if (mine.review) out.review = mine.review;
       return out;
     });
 }
