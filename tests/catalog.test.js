@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { catalogGames, catalogToMerge, normalizeName } from '../src/data/catalog.js';
+import { catalogGames, catalogToMerge, normalizeName, publishersToFill } from '../src/data/catalog.js';
 import { normalizeScoring } from '../src/logic/scoring.js';
 import { normalizeDice } from '../src/logic/dice.js';
 import { Store } from '../src/data/store.js';
@@ -185,5 +185,19 @@ describe('avis sur un jeu', () => {
     expect(normalizeReview({ rating: 0, comment: '   ' })).toBeNull();
     expect(normalizeReview(null)).toBeNull();
     expect(stars(3)).toBe('★★★☆☆');
+  });
+});
+
+describe('éditeurs', () => {
+  it('complète l’éditeur sans toucher au reste de la fiche', () => {
+    const loco = catalogGames().find((g) => g.name === 'Loco Circus');
+    expect(loco.publisher).toBe('Smart Games');
+    const mine = { ...loco, publisher: '', notes: 'Nos notes', updatedAt: Date.now() };
+    const handMade = { id: 'perso', name: 'azul', publisher: '', deleted: false };
+    const already = { id: 'x', name: 'Uno', publisher: 'Autre', deleted: false };
+    const out = publishersToFill([mine, handMade, already]);
+    expect(out).toHaveLength(2);
+    expect(out[0]).toMatchObject({ publisher: 'Smart Games', notes: 'Nos notes' });
+    expect(out[1]).toMatchObject({ id: 'perso', publisher: 'Plan B Games' });
   });
 });
