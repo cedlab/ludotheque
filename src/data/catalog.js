@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 15;
+export const CATALOG_VERSION = 16;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -197,6 +197,8 @@ const GAMES = [
   ['Tactilo Loto', 1, 4, 10, 3, HIGH, { status: 'totest', notes: 'Djeco : reconnaître les animaux au toucher.' }],
   // Ajouts (version 15) : testés à l'association
   ['Château Logique', 1, 1, 10, 3, HIGH, { status: 'tested', notes: 'Smart Games, 48 défis de facile à difficile : bâtir tours et châteaux.' }],
+  // Ajouts (version 16)
+  ['Dune : Imperium', 1, 4, 90, 14, sc('target', { target: 10 }), { status: 'totest', notes: 'Construction de deck et placement d’ouvriers dans l’univers de Dune : le premier à 10 points de victoire déclenche la fin.' }],
 ];
 
 /**
@@ -251,6 +253,7 @@ const STYLES = {
   'Keekee': ['enfants'],
   'Tactilo Loto': ['enfants'],
   'Château Logique': ['reflexion', 'enfants'],
+  'Dune : Imperium': ['strategie', 'cartes'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -403,7 +406,7 @@ const PUBLISHERS = {
   'Splendor': 'Space Cowboys', 'Unlock!': 'Space Cowboys', 'Unlock! Kids': 'Space Cowboys',
   'Augustus': 'Hurrican', 'Mr. Jack': 'Hurrican',
   'Wingspan': 'Matagot', 'Wingspan Asie': 'Matagot', 'Everdell': 'Matagot',
-  'Cascadia': 'Lucky Duck Games', 'Tranquillité': 'Lucky Duck Games', 'Earth': 'Lucky Duck Games',
+  'Dune : Imperium': 'Lucky Duck Games', 'Cascadia': 'Lucky Duck Games', 'Tranquillité': 'Lucky Duck Games', 'Earth': 'Lucky Duck Games',
   'It’s a Wonderful World': 'La Boîte de Jeu', 'Viticulture : Édition essentielle': 'La Boîte de Jeu',
   'Dinosaur World': 'La Boîte de Jeu',
   'Turing Machine': 'Le Scorpion Masqué', 'Zombie Kidz Évolution': 'Le Scorpion Masqué',
@@ -455,7 +458,7 @@ const ICONS = {
   'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
   'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
   'Loco Circus': '🚂', 'IQ Love': '💖', 'La Fée aux fleurs': '🧚', 'Little Cooperation': '🦭', 'Rhino Hero Junior': '🦏',
-  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰',
+  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰', 'Dune : Imperium': '🪱',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
