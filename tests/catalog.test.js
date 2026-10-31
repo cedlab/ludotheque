@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { catalogGames, catalogToMerge, normalizeName, publishersToFill } from '../src/data/catalog.js';
+import { catalogGames, catalogPatches, catalogToMerge, normalizeName, publishersToFill } from '../src/data/catalog.js';
 import { normalizeScoring } from '../src/logic/scoring.js';
 import { normalizeDice } from '../src/logic/dice.js';
 import { Store } from '../src/data/store.js';
@@ -212,5 +212,16 @@ describe('éditeurs', () => {
     expect(out).toHaveLength(2);
     expect(out[0]).toMatchObject({ publisher: 'Smart Games', notes: 'Nos notes' });
     expect(out[1]).toMatchObject({ id: 'perso', publisher: 'Plan B Games' });
+  });
+});
+
+describe('corrections du catalogue', () => {
+  it('passe les jeux testés en « Testés » sans écraser les changements de la famille', () => {
+    const keekee = { id: 'k', name: 'Keekee', status: 'totest', minPlayers: 2, maxPlayers: 5, duration: 15, notes: 'Infos à vérifier sur la boîte.', deleted: false };
+    const fee = { id: 'f', name: 'La Fée aux fleurs', status: 'owned', deleted: false };
+    const out = catalogPatches([keekee, fee], 14);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ status: 'tested', minPlayers: 1, maxPlayers: 5, duration: 10 }); // max modifié à la main : gardé
+    expect(catalogPatches([keekee], 15)).toEqual([]);
   });
 });

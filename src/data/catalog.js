@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 14;
+export const CATALOG_VERSION = 15;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -190,11 +190,28 @@ const GAMES = [
   // Ajouts (version 13) : vus à l'association, rangés dans « À tester »
   ['Loco Circus', 1, 1, 10, 3, HIGH, { status: 'totest', notes: 'Smart Games, 48 défis de facile à difficile : préparer Firmin le train.' }],
   ['IQ Love', 1, 1, 10, 6, HIGH, { status: 'totest', notes: 'Casse-tête Smart Games, 120 défis. Nom et infos à vérifier sur la boîte.' }],
-  ['La Fée aux fleurs', 1, 4, 10, 2, HIGH, { status: 'totest', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
-  ['Little Cooperation', 1, 4, 10, 2, COOP, { status: 'totest', notes: 'Djeco, premier jeu coopératif (2 ans et demi à 5 ans).' }],
-  ['Rhino Hero Junior', 1, 4, 10, 2, HIGH, { status: 'totest', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
-  ['Keekee', 2, 4, 15, 4, HIGH, { status: 'totest', notes: 'Infos à vérifier sur la boîte.' }],
+  ['La Fée aux fleurs', 1, 4, 10, 2, HIGH, { status: 'tested', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
+  ['Little Cooperation', 1, 4, 10, 2, COOP, { status: 'tested', notes: 'Djeco, premier jeu coopératif (2 ans et demi à 5 ans).' }],
+  ['Rhino Hero Junior', 1, 4, 10, 2, HIGH, { status: 'tested', notes: 'HABA, « Mes premiers jeux ». Infos à vérifier sur la boîte.' }],
+  ['Keekee', 1, 6, 10, 4, HIGH, { status: 'tested', notes: 'Âge à vérifier sur la boîte.' }],
   ['Tactilo Loto', 1, 4, 10, 3, HIGH, { status: 'totest', notes: 'Djeco : reconnaître les animaux au toucher.' }],
+  // Ajouts (version 15) : testés à l'association
+  ['Château Logique', 1, 1, 10, 3, HIGH, { status: 'tested', notes: 'Smart Games, 48 défis de facile à difficile : bâtir tours et châteaux.' }],
+];
+
+/**
+ * Corrections ponctuelles des jeux déjà présents sur les téléphones. Un champ
+ * n'est changé que s'il a encore l'ancienne valeur : ce que la famille a
+ * modifié entre-temps est conservé.
+ */
+const PATCHES = [
+  { version: 15, name: 'Little Cooperation', fields: { status: ['totest', 'tested'] } },
+  { version: 15, name: 'Rhino Hero Junior', fields: { status: ['totest', 'tested'] } },
+  { version: 15, name: 'La Fée aux fleurs', fields: { status: ['totest', 'tested'] } },
+  { version: 15, name: 'Keekee', fields: {
+    status: ['totest', 'tested'], minPlayers: [2, 1], maxPlayers: [4, 6], duration: [15, 10],
+    notes: ['Infos à vérifier sur la boîte.', 'Âge à vérifier sur la boîte.'],
+  } },
 ];
 
 // Styles de jeu (voir logic/styles.js).
@@ -233,6 +250,7 @@ const STYLES = {
   'Rhino Hero Junior': ['enfants', 'rapidite'],
   'Keekee': ['enfants'],
   'Tactilo Loto': ['enfants'],
+  'Château Logique': ['reflexion', 'enfants'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -355,7 +373,7 @@ const STYLES = {
 
 // Éditeurs (édition française). Laissés vides quand ils ne sont pas confirmés.
 const PUBLISHERS = {
-  'Loco Circus': 'Smart Games', 'IQ Love': 'Smart Games', 'La Cité d’Or': 'Smart Games',
+  'Château Logique': 'Smart Games', 'Loco Circus': 'Smart Games', 'IQ Love': 'Smart Games', 'La Cité d’Or': 'Smart Games',
   'Ceci n’est pas une pomme': 'Smart Games',
   'Escargots… Prêts ? Partez !': 'HABA', 'Pyramide d’animaux': 'HABA', 'La Fée aux fleurs': 'HABA',
   'Rhino Hero Junior': 'HABA', 'À toi de deviner !': 'HABA',
@@ -437,7 +455,7 @@ const ICONS = {
   'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
   'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
   'Loco Circus': '🚂', 'IQ Love': '💖', 'La Fée aux fleurs': '🧚', 'Little Cooperation': '🦭', 'Rhino Hero Junior': '🦏',
-  'Keekee': '🐒', 'Tactilo Loto': '✋',
+  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
@@ -522,6 +540,22 @@ export function normalizeName(name = '') {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+/** Corrections à appliquer aux jeux présents, pour un téléphone resté à la version `fromVersion`. */
+export function catalogPatches(existingGames = [], fromVersion = 0) {
+  const out = [];
+  for (const patch of PATCHES.filter((p) => p.version > fromVersion)) {
+    const target = normalizeName(patch.name);
+    for (const g of existingGames.filter((x) => !x.deleted && normalizeName(x.name) === target)) {
+      const changes = {};
+      for (const [field, [from, to]] of Object.entries(patch.fields)) {
+        if (g[field] === from) changes[field] = to;
+      }
+      if (Object.keys(changes).length) out.push({ ...g, ...changes });
+    }
+  }
+  return out;
 }
 
 /**
