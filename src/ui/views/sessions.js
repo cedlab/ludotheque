@@ -14,6 +14,7 @@ import { openPicker } from '../picker.js';
 import { editPlayer, sortedPlayers, statTile } from './players.js';
 import { diceHref, gameMeta, sortedGames } from './games.js';
 import { uuid } from '../../data/records.js';
+import { finishFields, isPaused, pauseFields, pausedTotal, playedMs, reopenFields, resumeFields } from '../../logic/duration.js';
 
 // --- Aides ---------------------------------------------------------------------
 
@@ -87,7 +88,7 @@ export function sessionsView(_, query) {
         gameLogo(liveGame(s), 40),
         h('span', { class: 'grow' }, h('strong', null, liveGameName(s)),
           h('small', { class: 'muted' }, `${(s.players || []).map((p) => livePlayer(p).name).join(', ')}`)),
-        h('span', { class: 'badge' }, 'Reprendre')))))),
+        h('span', { class: 'badge' }, isPaused(s) ? '⏸ En pause' : 'Reprendre')))))),
     h('div', { class: 'pad-x' }, segmented([{ value: 'history', label: 'Historique' }, { value: 'stats', label: 'Statistiques' }], tab, draw)),
     body);
 }
@@ -323,7 +324,24 @@ export function playView({ id }) {
     const saved = store.save('sessions', s);
     s.updatedAt = saved.updatedAt;
   };
+  // Pause : le chrono s'arrête ; toucher un score reprend la partie automatiquement.
+  const pause = () => {
+    Object.assign(s, pauseFields(s));
+    persist();
+    vibrate(20);
+    draw();
+  };
+  const resume = (quiet = false) => {
+    Object.assign(s, resumeFields(s));
+    persist();
+    if (!quiet) toast('C’est reparti !', { duration: 1500 });
+    draw();
+  };
   const changed = () => {
+    if (isPaused(s)) {
+      Object.assign(s, resumeFields(s));
+      toast('Partie reprise.', { duration: 1500 });
+    }
     clearTimeout(saveTimer);
     saveTimer = setTimeout(persist, 400);
     draw();
@@ -357,8 +375,7 @@ export function playView({ id }) {
     }
     // Retire une dernière manche vide
     if (sc.rounds && s.rounds.length > 1 && Object.values(s.rounds[s.rounds.length - 1]).every((v) => !v)) s.rounds.pop();
-    s.status = 'finished';
-    s.endedAt = Date.now();
+    Object.assign(s, finishFields(s));
     persist();
     vibrate([60, 40, 200]);
     navigate(`/partie/${id}`, { replace: true });
@@ -387,7 +404,14 @@ export function playView({ id }) {
     changed();
   };
 
+  // Chrono de la partie (pauses déduites), mis à jour chaque minute sans tout redessiner.
+  const clock = h('span', { class: 'play-clock' });
+  const tick = () => { clock.textContent = `⏱ ${formatDuration(playedMs(s)) || '0 min'} de jeu`; };
+  const clockTimer = setInterval(tick, 20000);
+  tick();
+
   const draw = () => {
+    tick();
     const list = entrants(s);
     const ids = entrantIds(s);
     const tot = totals(sc, s, ids);
@@ -449,9 +473,14 @@ export function playView({ id }) {
         actions: [
           h('a', { class: 'icon-btn', href: diceHref(store.get('games', s.gameId), `/partie/${id}`), 'aria-label': 'Lancer des dés' }, icon('dice')),
           h('button', { class: 'icon-btn', 'aria-label': 'Tirage au doigt', onclick: () => openPicker() }, icon('hand')),
+          h('button', { class: `icon-btn ${isPaused(s) ? 'on' : ''}`, 'aria-label': isPaused(s) ? 'Reprendre la partie' : 'Mettre la partie en pause',
+            onclick: () => (isPaused(s) ? resume() : pause()) }, icon(isPaused(s) ? 'play' : 'pause')),
         ],
       }),
-      h('p', { class: 'muted small center-text' }, describeScoring(sc)),
+      h('p', { class: 'muted small center-text' }, describeScoring(sc), ' · ', clock),
+      isPaused(s) && h('button', { class: 'banner paused', onclick: () => resume() },
+        '⏸ Partie en pause',
+        h('small', null, 'Le chrono est arrêté · toucher pour reprendre')),
       banner,
       sc.mode !== MODES.COOP && h('div', { class: 'step-bar' },
         h('span', { class: 'muted small' }, 'Pas'),
@@ -492,7 +521,7 @@ export function playView({ id }) {
   }
 
   draw();
-  return { el: wrap, cleanup: () => { document.removeEventListener('visibilitychange', onHide); if (saveTimer) persist(); } };
+  return { el: wrap, cleanup: () => { clearInterval(clockTimer); document.removeEventListener('visibilitychange', onHide); if (saveTimer) persist(); } };
 }
 
 function resultView(s) {
@@ -523,7 +552,7 @@ function resultView(s) {
     navigate(`/partie/${ns.id}`);
   };
   const reopen = () => {
-    store.save('sessions', { ...s, status: 'playing', endedAt: null });
+    store.save('sessions', { ...s, ...reopenFields(s) });
     refresh();
   };
   const remove = async () => {
@@ -546,7 +575,8 @@ function resultView(s) {
     h('section', { class: `result-hero ${sc.mode === MODES.COOP && result.coop?.result !== 'win' ? 'lost' : ''}` },
       h('div', { class: 'confetti', 'aria-hidden': 'true' }, '🎉✨🎲✨🎉'),
       h('h2', null, title),
-      h('p', { class: 'muted' }, `${formatDate(s.endedAt)}${s.startedAt && s.endedAt ? ` · ${formatDuration(s.endedAt - s.startedAt)}` : ''}`)),
+      h('p', { class: 'muted' }, `${formatDate(s.endedAt)}${s.startedAt && s.endedAt ? ` · ${formatDuration(playedMs(s))} de jeu` : ''}`,
+        pausedTotal(s) >= 60000 ? ` (pauses : ${formatDuration(pausedTotal(s))})` : '')),
     sc.mode === MODES.COOP
       ? h('section', { class: 'card' },
           h('div', { class: 'chips center' }, list.map((p) => h('span', { class: 'player-chip on', style: { '--c': p.color } }, avatar(p, 28), p.name))),

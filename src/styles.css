@@ -1346,6 +1346,15 @@ textarea.input {
   font-size: 0.85rem;
   opacity: 0.85;
 }
+.banner.paused {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--text);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+.icon-btn.on {
+  background: var(--primary);
+  color: #fff;
+}
 .banner.win {
   background: linear-gradient(135deg, var(--sun), #f59a52);
   color: #3b2410;
