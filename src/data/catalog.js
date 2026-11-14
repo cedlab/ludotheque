@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 16;
+export const CATALOG_VERSION = 17;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -199,6 +199,8 @@ const GAMES = [
   ['Château Logique', 1, 1, 10, 3, HIGH, { status: 'tested', notes: 'Smart Games, 48 défis de facile à difficile : bâtir tours et châteaux.' }],
   // Ajouts (version 16)
   ['Dune : Imperium', 1, 4, 90, 14, sc('target', { target: 10 }), { status: 'totest', notes: 'Construction de deck et placement d’ouvriers dans l’univers de Dune : le premier à 10 points de victoire déclenche la fin.' }],
+  // Ajouts (version 17)
+  ['Point City', 1, 4, 30, 10, HIGH, { status: 'totest', notes: 'Draft de cartes : on récupère ressources et bâtiments pour construire la ville qui rapporte le plus de points.' }],
 ];
 
 /**
@@ -254,6 +256,7 @@ const STYLES = {
   'Tactilo Loto': ['enfants'],
   'Château Logique': ['reflexion', 'enfants'],
   'Dune : Imperium': ['strategie', 'cartes'],
+  'Point City': ['cartes', 'strategie', 'famille'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -382,7 +385,7 @@ const PUBLISHERS = {
   'Rhino Hero Junior': 'HABA', 'À toi de deviner !': 'HABA',
   'Little Cooperation': 'Djeco', 'Tactilo Loto': 'Djeco',
   'Rush Hour': 'ThinkFun', 'Gravity Maze': 'ThinkFun',
-  'Akropolis': 'Gigamic', 'Bazar Bizarre 2.0': 'Gigamic', 'Texto!': 'Gigamic', 'Médiévallons': 'Gigamic',
+  'Point City': 'Gigamic', 'Akropolis': 'Gigamic', 'Bazar Bizarre 2.0': 'Gigamic', 'Texto!': 'Gigamic', 'Médiévallons': 'Gigamic',
   'Similo : Animaux sauvages': 'Gigamic', 'Similo : Mythes': 'Gigamic', 'Pick Picknic': 'Gigamic',
   'Saboteur': 'Gigamic', '6 qui prend !': 'Gigamic', 'Gagne ton papa !': 'Gigamic',
   'Sushi Go Party!': 'Cocktail Games', 'Trio': 'Cocktail Games', 'Top Ten': 'Cocktail Games',
@@ -458,7 +461,7 @@ const ICONS = {
   'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
   'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
   'Loco Circus': '🚂', 'IQ Love': '💖', 'La Fée aux fleurs': '🧚', 'Little Cooperation': '🦭', 'Rhino Hero Junior': '🦏',
-  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰', 'Dune : Imperium': '🪱',
+  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰', 'Dune : Imperium': '🪱', 'Point City': '🏙️',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
