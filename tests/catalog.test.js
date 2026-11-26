@@ -225,3 +225,11 @@ describe('corrections du catalogue', () => {
     expect(catalogPatches([keekee], 15)).toEqual([]);
   });
 });
+
+describe('Heat arrive à la maison', () => {
+  it('passe de « À tester » à la maison, sauf déjà déplacé', () => {
+    const heat = { id: 'h', name: 'Heat : Pedal to the Metal', status: 'totest', duration: 45, deleted: false };
+    expect(catalogPatches([heat], 17)[0]).toMatchObject({ status: 'owned', duration: 60 });
+    expect(catalogPatches([{ ...heat, status: 'wishlist', duration: 50 }], 17)).toEqual([]);
+  });
+});

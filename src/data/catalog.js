@@ -7,7 +7,7 @@
 // Les informations (joueurs, durée, âge, comptage) sont celles des boîtes et
 // restent modifiables dans l'app.
 
-export const CATALOG_VERSION = 17;
+export const CATALOG_VERSION = 18;
 const T = Date.UTC(2024, 0, 1);
 // Date de la dernière révision du catalogue (v3 : vignettes). Plus récente que
 // les versions précédentes : un jeu non modifié sur le téléphone reçoit la
@@ -186,7 +186,7 @@ const GAMES = [
   ['Zombie Kidz Évolution', 2, 4, 15, 7, COOP, { status: 'totest', notes: 'Coopératif qui évolue au fil des parties (autocollants à débloquer).' }],
   ['Dragomino', 2, 4, 20, 5, HIGH, { status: 'totest', notes: 'La version enfants de Kingdomino.' }],
   ['Unlock!', 1, 6, 60, 10, COOP, { status: 'totest', notes: 'Escape game en cartes, version classique : l’étape après Unlock! Kids.' }],
-  ['Heat : Pedal to the Metal', 1, 6, 45, 10, HIGH, { status: 'totest', notes: 'Course de voitures avec des cartes : le premier à franchir la ligne d’arrivée gagne.' }],
+  ['Heat : Pedal to the Metal', 1, 6, 60, 10, HIGH, { notes: 'Course de voitures avec des cartes : le premier à franchir la ligne d’arrivée gagne.' }],
   // Ajouts (version 13) : vus à l'association, rangés dans « À tester »
   ['Loco Circus', 1, 1, 10, 3, HIGH, { status: 'totest', notes: 'Smart Games, 48 défis de facile à difficile : préparer Firmin le train.' }],
   ['IQ Love', 1, 1, 10, 6, HIGH, { status: 'totest', notes: 'Casse-tête Smart Games, 120 défis. Nom et infos à vérifier sur la boîte.' }],
@@ -201,6 +201,8 @@ const GAMES = [
   ['Dune : Imperium', 1, 4, 90, 14, sc('target', { target: 10 }), { status: 'totest', notes: 'Construction de deck et placement d’ouvriers dans l’univers de Dune : le premier à 10 points de victoire déclenche la fin.' }],
   // Ajouts (version 17)
   ['Point City', 1, 4, 30, 10, HIGH, { status: 'totest', notes: 'Draft de cartes : on récupère ressources et bâtiments pour construire la ville qui rapporte le plus de points.' }],
+  // Ajouts (version 18) : nouveaux jeux de la maison
+  ['Invocations', 1, 4, 30, 10, HIGH, { notes: 'Éditeur et comptage à vérifier sur la boîte.' }],
 ];
 
 /**
@@ -212,6 +214,8 @@ const PATCHES = [
   { version: 15, name: 'Little Cooperation', fields: { status: ['totest', 'tested'] } },
   { version: 15, name: 'Rhino Hero Junior', fields: { status: ['totest', 'tested'] } },
   { version: 15, name: 'La Fée aux fleurs', fields: { status: ['totest', 'tested'] } },
+  // Heat est arrivé à la maison (infos lues sur la boîte : 1 à 6 joueurs, 10+, 60 min).
+  { version: 18, name: 'Heat : Pedal to the Metal', fields: { status: ['totest', 'owned'], duration: [45, 60] } },
   { version: 15, name: 'Keekee', fields: {
     status: ['totest', 'tested'], minPlayers: [2, 1], maxPlayers: [4, 6], duration: [15, 10],
     notes: ['Infos à vérifier sur la boîte.', 'Âge à vérifier sur la boîte.'],
@@ -257,6 +261,7 @@ const STYLES = {
   'Château Logique': ['reflexion', 'enfants'],
   'Dune : Imperium': ['strategie', 'cartes'],
   'Point City': ['cartes', 'strategie', 'famille'],
+  'Invocations': ['cartes', 'strategie'],
   'Noé': ['cartes', 'famille'],
   'Wave': ['coop', 'cartes'],
   'Saboteur': ['bluff', 'cartes', 'ambiance'],
@@ -461,7 +466,7 @@ const ICONS = {
   'So Clover!': '🍀', 'The Crew : Mission sous-marine': '🐙', 'Dixit': '🖼️', 'Zombie Kidz Évolution': '🧟',
   'Dragomino': '🐉', 'Unlock!': '🔐', 'Heat : Pedal to the Metal': '🏎️',
   'Loco Circus': '🚂', 'IQ Love': '💖', 'La Fée aux fleurs': '🧚', 'Little Cooperation': '🦭', 'Rhino Hero Junior': '🦏',
-  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰', 'Dune : Imperium': '🪱', 'Point City': '🏙️',
+  'Keekee': '🐒', 'Tactilo Loto': '✋', 'Château Logique': '🏰', 'Dune : Imperium': '🪱', 'Point City': '🏙️', 'Invocations': '✨',
   'Noé': '🛶',
   'Wave': '🏄',
   'Saboteur': '⛏️',
